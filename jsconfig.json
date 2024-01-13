@@ -5,9 +5,6 @@
       "paths": {
         "@/": ["./src/"],
         "@api/": ["./src/api/"],
-        "@cmp/": ["./src/shared/cmp/"],
-        "@stores/": ["./src/shared/stores/"],
-        "@use/": ["./src/shared/use/"]
       }
     }
   }
