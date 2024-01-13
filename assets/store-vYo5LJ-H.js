@@ -1,1 +1,0 @@
-import{d as r,f as a,s as i}from"./index-Tu8O3AmP.js";const u=r("blocks",()=>{const e=a(!1);function o(){e.value=!e.value}const s=localStorage.getItem("isAuthorizedUser");return s&&(e.value=JSON.parse(s)),i(e,t=>{localStorage.setItem("isAuthorizedUser",JSON.stringify(t))}),{isAuthorizedUser:e,logIn:o}});export{u};
