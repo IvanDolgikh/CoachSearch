@@ -38,7 +38,7 @@ export const router = createRouter({
                 {
                     path: 'coach/:trainerId',
                     name: 'coach',
-                    component: () => import('../components/AuthorizedUser/CoachInfo.vue'),
+                    component: () => import('../components/AuthorizedUser/CoachInfo/CoachInfo.vue'),
                 },
                 {
                     path: 'gyms',

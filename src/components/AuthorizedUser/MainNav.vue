@@ -32,7 +32,6 @@ const checkRole = computed(() => {
      }
 })
 
-console.log(role);
 
 </script>
 

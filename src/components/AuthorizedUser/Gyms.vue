@@ -9,7 +9,7 @@
 
 <script setup>
 import Map from '../Lib/Map.vue';
-import { getData } from '@api/api.js'
+import { getData, baseUrl } from '@api/api.js'
 import { initMap } from '@api/apiMap.js'
 import { reactive, toRaw, onMounted } from 'vue';
 import { useCoordsStore } from '../../store/coordsStore'
@@ -18,7 +18,7 @@ const coordsStore = useCoordsStore()
 
 const apiKey = 'b9792c26-9b3a-42d8-a4f6-5160e8801ffc';
 
-const urlAllAddress = 'http://localhost:5161/api/trainer/addresses'
+const urlAllAddress = `${baseUrl}api/trainer/addresses`
 
 const getCoordsForAddress = async(address) => {
     try {  
@@ -54,7 +54,7 @@ const getAllCoords = async() => {
 onMounted(async() => {
     const result = await getData(urlAllAddress)
     coordsStore.address = result.addresses
-    
+
     const coords = await getAllCoords()
     initMap(coords)
 })

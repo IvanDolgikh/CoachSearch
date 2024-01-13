@@ -36,8 +36,9 @@
     
 <script setup>
 import { ref, computed } from 'vue' 
+import { baseUrl } from '@api/api.js'
 
-const urlLike = 'http://localhost:5161/api/like'
+const urlLike = `${baseUrl}api/like`
 
 const props = defineProps(['coach'])
 

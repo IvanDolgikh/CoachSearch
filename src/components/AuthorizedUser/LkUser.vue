@@ -28,9 +28,9 @@
 <script setup>
 import { ref, toRefs, onMounted } from 'vue'
 
-import { getData } from '@api/api.js'
+import { getData, baseUrl } from '@api/api.js'
 
-const url = 'http://localhost:5161/api/customer/profile'
+const url = `${baseUrl}api/customer/profile`
 
 const data = ref([])
 

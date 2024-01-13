@@ -24,6 +24,8 @@
 //     }
 // }
 
+const baseUrl = 'http://wertyqin-001-site1.atempurl.com/'
+
 
 const sendData = async(url, data) => {
     try {
@@ -38,7 +40,6 @@ const sendData = async(url, data) => {
         });
         if (response.ok) {
             const getData = await response.json();
-            console.log(getData);
             return getData;
         } else {
             throw new Error('Something wrong');
@@ -59,7 +60,6 @@ const getData = async (url) => {
   
       if (response.ok) {
         const result = await response.json()
-        console.log(result)
         return result
       } else {
         throw new Error('Something wrong')
@@ -69,4 +69,4 @@ const getData = async (url) => {
     }
   }
 
-export { sendData, getData }
+export { sendData, getData, baseUrl }

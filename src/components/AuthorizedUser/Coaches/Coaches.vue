@@ -15,10 +15,9 @@ import Coach from './Coach.vue';
 
 import { ref, toRefs, onMounted } from 'vue'
 
-import { getData } from '@api/api.js'
+import { getData, baseUrl } from '@api/api.js'
 
-
-const urlAllTrainers = 'http://localhost:5161/api/trainer'
+const urlAllTrainers = `${baseUrl}api/trainer`
 
 const data = ref([])
 

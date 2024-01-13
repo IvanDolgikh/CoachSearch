@@ -3,7 +3,7 @@ const cityCoords = [56.8519, 60.6122]
 let myPlacemark = null;
 let map = null;
 
-const initMap = (array) => {
+const initMap = async(array) => {
     ymaps.ready(function () {
 
         map = new ymaps.Map("map", {

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useBlocksStore } from '../store/store'
-import { sendData } from '../api/api'
+import { sendData, baseUrl } from '@api/api.js'
 import { ref, reactive, computed } from 'vue'
 
 
@@ -10,7 +10,7 @@ export const useRegisterStore = defineStore('register', () => {
     const router = useRouter()
     const blocksStore = useBlocksStore()
 
-    const urlBase = 'http://localhost:5161/api/auth/register'
+    const urlBase = `${baseUrl}api/auth/register`
 
     //Общие данные
     const commonData = reactive({
@@ -60,7 +60,6 @@ export const useRegisterStore = defineStore('register', () => {
                 localStorage.setItem('role', response.role)
                 blocksStore.logIn();
                 router.push('/authorized-user')
-                console.log(data)
                 return response
             } else {
                 console.log('Не существующая роль')

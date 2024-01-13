@@ -40,9 +40,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getData } from '@api/api.js'
+import { getData, baseUrl } from '@api/api.js'
 
-const url = 'http://localhost:5161/api/trainer/profile'
+const url = `${baseUrl}api/trainer/profile`
 
 const data = ref([])
 
