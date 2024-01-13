@@ -6,7 +6,7 @@ const Authorization = () => import('../components/Authorization.vue')
 const AuthorizedUser = () => import('../components/AuthorizedUser/AuthorizedUser.vue')
 
 export const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory('/CoachSearch/'),
     routes: [
         {
             path: '/',
