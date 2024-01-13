@@ -8,7 +8,7 @@
 
             <div class="coach__image-container">
                 <img class="coach__image" v-if="dataTrainers.avatarUrl" :src="dataTrainers.avatarUrl" width="200" height="200" alt="Фото тренера">
-                <img class="coach__image" v-else src="../../assets/images/mok/unknown.jpg" width="200" height="200" alt="">
+                <img class="coach__image" v-else src="../../../assets/images/mok/unknown.jpg" width="200" height="200" alt="">
                 <a class="coach__social-link" :href="dataTrainers.vkLink">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="38" height="38">
                         <path fill="#1976d2" d="M24 4A20 20 0 1 0 24 44A20 20 0 1 0 24 4Z" />
