@@ -1,77 +1,72 @@
 <template>
 <div class="registration">
     <div class="registration__container">
-        <form class="registration__form" action="post">
+        <form class="registration__form" method="post" @submit.prevent="registerStore.sendDataReg()">
 
             <div class="registration__base-data base-data">
                 <span class="registration__title">Личная информация</span>
 
                 <label class="base-data__input-container">
                     <span>ФИО</span>
-                    <input type="text">
+                    <input type="text" name="FullName" required v-model="fullName">
                 </label>
 
                 <label class="base-data__input-container">
                     <span>Номер телефона</span>
-                    <input type="tel">
+                    <input type="tel" name="PhoneNumber" required maxlength="11" v-model="phoneNumber">
                 </label>
 
                 <label class="base-data__input-container">
                     <span>Электронная почта</span>
-                    <input type="email">
+                    <input type="email" name="Email" v-model="email" required>
                 </label>
 
                 <label class="base-data__input-textarea-container">
                     <span>Расскажите о себе</span>
-                    <textarea name="" id="" cols="30" rows="5"></textarea>
+                    <textarea name="Info" id="" cols="30" rows="5" v-model="info"></textarea>
                 </label>
 
-                <label class="base-data__input-container" v-if="isCoach">
+                <label class="base-data__input-container" v-if="registerStore.userRole">
                     <span>Место проведения<br>тренировок</span>
-                    <input type="text">
+                    <input type="text" name="Address" v-model="address">
                 </label>
 
-                <label class="base-data__input-container" v-if="isCoach">
+                <label class="base-data__input-container" v-if="registerStore.userRole">
                     <span>Специализация</span>
-                    <input type="text">
+                    <input type="text" required v-model="specialization">
                 </label>
             </div>
 
             <div class="registration__social social">
                 <label class="social__input-image-container">
                     <span>Ваше фото</span>
-                    <img class="social__custom-input-image" :src="dynamicSrc" alt="">
-                    <input class="visually-hidden" @change="readSrc" type="file">
+                    <img class="social__custom-input-image" :src="avatarShow" alt="">
+                    <input type="file" class="visually-hidden" name="Avatar" @change="readSrc">
                 </label>
 
                 <span class="social__title">Профили в соцсетях</span>
 
                 <label class="social__input-container">
                     <span>Вконтакте</span>
-                    <input type="text">
+                    <input type="text" name="VkLink" v-model="vkLink">
                 </label>
 
                 <label class="social__input-container">
                     <span>Телеграмм</span>
-                    <input type="text">
+                    <input type="text" name="TelegramLink" v-model="telegramLink">
                 </label>
             </div>
 
             <div class="registration__entrance-data">
                 <label class="registration__input-container">
-                    <span>Логин</span>
-                    <input type="text">
-                </label>
-
-                <label class="registration__input-container">
                     <span>Пароль</span>
-                    <input type="password">
+                    <input type="password" name="Password" required v-model="password">
                 </label>
             </div>
 
             <div class="registration__button-container">
                 <label class="registration__checkbox-container">
-                    <input type="checkbox" v-model="isCoach">
+                    <input type="checkbox" v-model="registerStore.userRole">
                     <span>Я&nbsp;тренер</span>
                 </label>
                 <button class="registration__button">Зарегистрироваться</button>
@@ -83,24 +78,31 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, toRefs} from 'vue'
+import { useRegisterStore } from '../store/registerStore'
 
-const isCoach = ref(false)
-const dynamicSrc = ref('');
+const registerStore = useRegisterStore();
+
+const {phoneNumber, email, password, fullName, info, vkLink, telegramLink, avatar} = toRefs(registerStore.commonData)
+const {specialization, address} = toRefs(registerStore.additionalTrainerData)
+
+const avatarShow = ref('')
 
 const readSrc = (evt) => {
-    const file = evt.target.files[0];
+  const file = evt.target.files[0];
 
-    if(file) {
-        const reader = new FileReader
+  if (file) {
+    avatar.value = file;
+    const reader = new FileReader();
 
-        reader.onload = () => {
-            dynamicSrc.value = reader.result
-        }
-
-        reader.readAsDataURL(file)
+    reader.onload = () => {
+        avatarShow.value = reader.result;
     }
-}
+
+    reader.readAsDataURL(file);
+  }
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -147,6 +149,7 @@ const readSrc = (evt) => {
         display: grid;
         grid-template-columns: 1fr 1fr;
         column-gap: 40px;
+        position: relative;
     }
 
     &__social {

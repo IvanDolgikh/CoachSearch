@@ -26,14 +26,19 @@ export const router = createRouter({
                     component: () => import('../components/AuthorizedUser/LkUser.vue')
                 },
                 {
-                    path: 'coaches',
-                    name: 'coaches',
-                    component: () => import('../components/AuthorizedUser/Coaches.vue'),
+                    path: 'lkcoach',
+                    name: 'lkcoach',
+                    component: () => import('../components/AuthorizedUser/LkCoach.vue')
                 },
                 {
-                    path: 'coach',
+                    path: 'coaches',
+                    name: 'coaches',
+                    component: () => import('../components/AuthorizedUser/Coaches/Coaches.vue'),
+                },
+                {
+                    path: 'coach/:trainerId',
                     name: 'coach',
-                    component: () => import('../components/AuthorizedUser/CoachInfo.vue')
+                    component: () => import('../components/AuthorizedUser/CoachInfo.vue'),
                 },
                 {
                     path: 'gyms',

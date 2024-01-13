@@ -1,18 +1,18 @@
 <template>
 <div class="authorization">
     <div class="authorization__container">
-        <form class="authorization__form" action="post" >
+        <form class="authorization__form" method="post" @submit.prevent="authStore.sendDataAuth()">
             <label class="authorization__label">
                 <span>Логин</span>
-                <input type="text" v-model="login">
+                <input type="text" name="Login" v-model="authStore.login">
             </label>
 
             <label class="authorization__label">
                 <span>Пароль</span>
-                <input type="password" v-model="password">
+                <input type="password" name="Password" v-model="authStore.password">
             </label>
 
-            <button class="authorization__button" @click.prevent="checkData">Войти</button>
+            <button class="authorization__button">Войти</button>
         </form>
         <RouterLink to="/registration" class="authorization__question">Нет аккаунта?</RouterLink>
     </div>
@@ -20,28 +20,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBlocksStore } from '../store/store'
+import { useAuthStore } from '../store/authStore';
 
 const router = useRouter()
 const blocksStore = useBlocksStore()
-
-const fLogin = '1'
-const fPassword = '1'
-
-const login = ref('')
-const password = ref('')
-
-
-const checkData = () => {
-  if (login.value === fLogin && password.value === fPassword) {
-    router.push('/authorized-user')
-    blocksStore.logIn()
-  } else {
-    alert('Неверный логин или пароль')
-  }
-}
+const authStore = useAuthStore()
 
 </script>
 
