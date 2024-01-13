@@ -2,7 +2,8 @@
 
 <li class="users-comment">
     <div class="users-comment__container">
-        <img class="users-comment__image" :src="commentInfo.avatarUrl" width="70" height="70" alt="">
+        <img class="users-comment__image" v-if="commentInfo.avatarUrl" :src="commentInfo.avatarUrl" width="70" height="70" alt="">
+        <img class="users-comment__image" v-else src="../../../../assets/images/mok/unknown.jpg" width="70" height="70" alt="">
         <p class="users-comment__name">{{ commentInfo.customerName }}</p>
         <p class="users-comment__text">{{ commentInfo.reviewText }}</p>
         <p class="users-comment__date">Дата публикации: {{ commentInfo.reviewDate.slice(0, 10) }}</p>
