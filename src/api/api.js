@@ -24,7 +24,7 @@
 //     }
 // }
 
-const baseUrl = 'http://wertyqin-001-site1.atempurl.com/'
+const baseUrl = 'https://wertyqin-001-site1.atempurl.com/'
 
 
 const sendData = async(url, data) => {
