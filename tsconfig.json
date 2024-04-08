@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    "allowJs": true,        /* Разрешить компиляцию JavaScript файлов */
+    "checkJs": false,       /* Включить проверку типов в JavaScript файлах */
+ 
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "paths": {
+      "@api/*": ["./src/api/*"],
+      "@icons-svg/*": ["./src/assets/images/svg/*"],
+      "@variables": ["./src/assets/style/variables.scss"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.js"],
+  "references": [{ "path": "./tsconfig.node.json" }],
+}
