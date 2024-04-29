@@ -49,13 +49,6 @@
                                     name="Address"
                                     v-model="address" />
                             </label>
-
-                            <label class="base-data__input-container">
-                                <span>Специализация</span>
-                                <input type="text"
-                                    required
-                                    v-model="specialization" />
-                            </label>
                         </div>
                     </Transition>
                 </div>
@@ -110,16 +103,27 @@
                     </button>
                 </div>
             </form>
+
+            <transition name="error">
+                <ErrorReg class="registration__error"
+                    v-if="errorsStore.errorPhoneReg || errorsStore.errorEmailReg" />
+            </transition>
         </div>
     </div>
 </template>
 
 <script setup
     lang="ts">
+
+    import ErrorReg from "../Common/ErrorReg.vue";
+
     import { ref, toRefs, computed } from "vue";
     import { useRegisterStore } from "../../store/registerStore";
 
+    import { useErrorsStore } from "../../store/errorsStore";
+
     const registerStore = useRegisterStore();
+    const errorsStore = useErrorsStore()
 
     const {
         phoneNumber,
@@ -132,7 +136,7 @@
         avatar,
     } = toRefs(registerStore.commonData);
 
-    const { specialization, address } = toRefs(registerStore.additionalDataTrainer)
+    const { address } = toRefs(registerStore.additionalDataTrainer)
 
     type TAvatarShow = string | ArrayBuffer
 
@@ -183,6 +187,17 @@
         justify-content: center;
         overflow: auto;
 
+        &__container {
+            position: relative;
+            width: fit-content;
+            height: auto;
+            padding: 35px;
+            background-color: rgb(255 255 255);
+            border-radius: 8px;
+            box-shadow: 7px 7px 17px 6px rgba(0, 0, 0, 0.2);
+            margin: 10% 0;
+        }
+
         input {
             width: 80%;
             background-color: transparent;
@@ -203,16 +218,6 @@
             font-size: 18px;
             margin-bottom: 15px;
             font-weight: 500;
-        }
-
-        &__container {
-            width: fit-content;
-            height: auto;
-            padding: 35px;
-            background-color: rgb(255 255 255);
-            border-radius: 8px;
-            box-shadow: 7px 7px 17px 6px rgba(0, 0, 0, 0.2);
-            margin: 10% 0;
         }
 
         &__form {
@@ -273,6 +278,15 @@
         span.registration__title {
             font-size: 26px;
             margin-bottom: 20px;
+        }
+
+        &__error {
+            position: absolute;
+            top: -64px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            width: fit-content;
         }
     }
 
@@ -351,6 +365,16 @@
     .slide-fade-enter-from,
     .slide-fade-leave-to {
         transform: translateY(40px);
+        opacity: 0;
+    }
+
+    .error-enter-active,
+    .error-leave-active {
+        transition: opacity 0.2s ease;
+    }
+
+    .error-enter-from,
+    .error-leave-to {
         opacity: 0;
     }
 </style>

@@ -5,25 +5,34 @@
                 <ul class="main-user__list">
                     <li class="main-user__item">
                         <router-link class="main-user__link"
-                            :to="checkedRole">Личный кабинет</router-link>
+                            :to="checkedRole">
+                            <span class="pi pi-user"></span>
+                            Личный кабинет
+                        </router-link>
                     </li>
                     <li class="main-user__item">
                         <router-link class="main-user__link"
-                            :to="{ name: 'coaches' }">Тренеры</router-link>
+                            :to="{ name: 'coaches' }">
+                            <span class="pi pi-users"></span>
+                            Тренеры
+                        </router-link>
                     </li>
                     <li class="main-user__item">
                         <router-link class="main-user__link"
-                            :to="{ name: 'gyms' }">Залы</router-link>
+                            :to="{ name: 'gyms-list' }">
+                            <span class="pi pi-list"></span>
+                            Залы
+                        </router-link>
                     </li>
                     <li class="main-user__item">
                         <button class="main-user__link"
                             @click="logOutProfile">
+                            <span class="pi pi-sign-out"></span>
                             Выход
                         </button>
                     </li>
                 </ul>
             </div>
-
 
             <RouterView></RouterView>
 
@@ -66,27 +75,36 @@
 
         &__menu {
             grid-column: 1;
-            background-color: rgb(219 219 219);
-            padding: 70px 80px;
+            background-color: $color-dark;
+            padding: 90px 40px;
             min-height: calc(100vh - 104px);
         }
 
         &__list {
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 50px;
         }
 
         &__link {
+            display: flex;
+            align-items: center;
+            column-gap: 20px;
             font-family: "Montserrat", sans-serif;
             color: #4d4d4d;
             font-weight: 300;
             padding: 0;
             background-color: transparent;
             border: none;
-            font-size: 24px;
-            color: $color-base-text;
+            font-size: 22px;
+            color: $color-base-white;
             cursor: pointer;
+
+            span {
+                display: block;
+                font-size: 24px;
+                color: $color-accent;
+            }
         }
 
 

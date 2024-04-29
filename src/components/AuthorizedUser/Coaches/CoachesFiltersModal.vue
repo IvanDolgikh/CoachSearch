@@ -2,7 +2,7 @@
     <div class="filter">
         <div class="filter__container">
             <button class="filter__button-cancel"
-                @click="$emit('close-modal')">
+                @click="filtersStore.isOpenModal = !filtersStore.isOpenModal">
                 <span class="pi pi-times"></span>
             </button>
 
@@ -19,10 +19,11 @@
             <CoachesFiltersSliderExperience />
 
             <p class="filter__experience-title">Начать показ с лучших?</p>
-            <CoachesFiltersSliderBest />
+            <CoachesFiltersBest />
 
             <div class="filter__button-container">
-                <button class="filter__button-accept">Применить</button>
+                <button class="filter__button-accept"
+                    @click="acceptFilters">Применить</button>
                 <button class="filter__button-remove">Сбросить</button>
             </div>
         </div>
@@ -32,15 +33,71 @@
 <script setup
     lang="ts">
 
-    import { defineEmits } from 'vue';
+    import { inject, Ref } from 'vue';
 
     import CoachesFiltersSelectButton from './CoachesFiltersSelectButton.vue'
     import CoachesFiltersRadioButtonAge from './CoachesFiltersRadioButtonAge.vue'
     import CoachesFiltersSliderAge from './CoachesFiltersSliderAge.vue';
     import CoachesFiltersSliderExperience from './CoachesFiltersSliderExperience.vue';
-    import CoachesFiltersSliderBest from './CoachesFiltersSliderBest.vue';
+    import CoachesFiltersBest from './CoachesFiltersBest.vue';
 
-    const emit = defineEmits(['close-modal'])
+    import { useFiltersStore } from '../../../store/filtersStore';
+
+    const filtersStore = useFiltersStore()
+
+    interface IData {
+        coachId: string;
+        address: string;
+        avatarUrl: string;
+        fullName: string;
+        isLiked: boolean;
+        likesCount: number;
+        specializations: string[];
+    }
+
+    const data = inject<Ref<IData[]> | undefined>('keysForFilters')
+    filtersStore.filteredCoaches = data?.value
+    console.log(data?.value)
+
+
+    const filterSpecializations = (data: IData[] | undefined) => {
+        const listSpecializations: string[] = filtersStore.valueSpecialization.map(item => item.name)
+
+        if (listSpecializations.length === 0) {
+            return data
+        } else if (data) {
+
+            const result: IData[] = data.filter(item => {
+                for (let val of item.specializations) {
+                    console.log(item.fullName, item.specializations)
+                    console.log(val)
+                    console.log(listSpecializations.includes(val))
+                    if (listSpecializations.includes(val)) {
+                        return true;
+                    }
+                }
+            });
+
+            // const result: IData[] = data.filter(item => {
+            //     for (let val of listSpecializations) {
+            //         console.log(item.fullName, item.specializations)
+            //         console.log(val)
+            //         console.log(item.specializations.includes(val))
+            //         return item.specializations.includes(val)
+            //     }
+            // });
+            filtersStore.filteredCoaches = result
+
+            // filtersStore.filteredCoaches = data.filter(item => item.specializations.some(spec => listSpecializations.includes(spec)))
+        }
+    }
+
+    const acceptFilters = () => {
+        if (data) {
+            filterSpecializations(filtersStore.filteredCoaches)
+            filtersStore.isOpenModal = !filtersStore.isOpenModal
+        }
+    }
 
 </script>
 

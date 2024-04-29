@@ -2,8 +2,8 @@
     <li class="users-comment">
         <div class="users-comment__container">
             <img class="users-comment__image"
-                v-if="commentInfo.avatarUrl"
-                :src="commentInfo.avatarUrl"
+                v-if="commentInfo.customerAvatarUrl"
+                :src="commentInfo.customerAvatarUrl"
                 width="70"
                 height="70"
                 alt="">
@@ -13,26 +13,28 @@
                 width="70"
                 height="70"
                 alt="">
-            <p class="users-comment__name">{{ commentInfo.customerName }}</p>
-            <p class="users-comment__text">{{ commentInfo.reviewText }}</p>
-            <p class="users-comment__date">Дата публикации: {{ commentInfo.reviewDate.slice(0, 10) }}</p>
+            <p class="users-comment__name">{{ commentInfo.customerFullName }}</p>
+            <p class="users-comment__text">{{ commentInfo.text }}</p>
+            <p class="users-comment__date">Дата публикации: {{ commentInfo.dateCreated.slice(0, 10) }}</p>
         </div>
     </li>
 </template>
 
-<script setup lang="ts">
-import { defineProps } from 'vue';
+<script setup
+    lang="ts">
+    import { defineProps } from 'vue';
 
-interface IcommentInfo {
-    avatarUrl: string,
-    customerName: string,
-    reviewDate: string,
-    reviewText: string,
-}
+    interface IcommentInfo {
+        reviewId: string
+        customerAvatarUrl: string,
+        customerFullName: string,
+        dateCreated: string,
+        text: string,
+    }
 
-defineProps<{
-    commentInfo: IcommentInfo
-}>()
+    defineProps<{
+        commentInfo: IcommentInfo
+    }>()
 
 
 
@@ -81,4 +83,5 @@ defineProps<{
         }
     }
 
-}</style>
+}
+</style>

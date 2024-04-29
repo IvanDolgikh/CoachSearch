@@ -29,29 +29,30 @@
     import { reactive, defineProps } from 'vue'
     import { baseUrl } from '@api/api.js'
 
-    const url: string = `${baseUrl}review/add`
-
     interface IReviews {
-        avatarUrl: string,
-        customerName: string,
-        reviewDate: string,
-        reviewText: string,
+        reviewId: string
+        customerAvatarUrl: string,
+        customerFullName: string,
+        dateCreated: string,
+        text: string,
     }
 
-    const props = defineProps<{
-        trainerId: string
-        reviews: IReviews[]
-    }>()
-
     interface IData {
-        trainerId: string,
+        coachId: string,
         reviewText: string
     }
 
+    const props = defineProps<{
+        coachId: string
+        reviews: IReviews[]
+    }>()
+
     const data: IData = reactive({
-        trainerId: props.trainerId,
+        coachId: props.coachId,
         reviewText: ''
     })
+
+    const url: string = `${baseUrl}api/coach/review/${props.coachId}`
 
     const acceptData = async () => {
 
@@ -60,7 +61,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                    Authorization: 'Bearer ' + localStorage.getItem('accessToken')
                 },
                 body: JSON.stringify(data)
             })
@@ -105,7 +106,7 @@
                 background-color: transparent;
                 resize: none;
                 font-size: 20px;
-                color: #ffffff;
+                color: $color-base-text;
                 margin-bottom: 15px;
                 width: 70%;
                 border-radius: 5px;

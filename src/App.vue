@@ -1,9 +1,9 @@
 <template>
-  <HeaderBlock v-if="hideBlocks" />
+  <HeaderBlock v-if="hideHeader" />
   <main>
     <RouterView></RouterView>
   </main>
-  <FooterBlock v-if="hideBlocks" />
+  <FooterBlock v-if="hideFooter" />
 
   <Preloader v-if="preloaderStore.loading" />
 </template>
@@ -23,8 +23,12 @@
 
   const router = useRoute()
 
-  const hideBlocks = computed<boolean>(() => {
+  const hideFooter = computed<boolean>(() => {
     return router.matched.some(direct => !(direct.name === 'authorization' || direct.name === 'registration'))
+  })
+
+  const hideHeader = computed<boolean>(() => {
+    return router.matched.some(direct => (direct.name === 'main'))
   })
 
 </script>

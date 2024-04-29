@@ -10,11 +10,11 @@ export const useAuthStore = defineStore('auth', () => {
     const preloaderStore = usePreloaderStore();
     const errorsStore = useErrorsStore()
     
-    type TProfile = {
+    interface IProfile {
         name: string
     }
 
-    const checkRole = (role: string): TProfile => {
+    const checkRole = (role: string): IProfile => {
         if(role === 'Customer') {
             return {name: 'user-profile'}
         } else {
@@ -44,24 +44,23 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const response: any = await sendData(urlAuth, data)
 
-            localStorage.setItem('token', response.token)
+            localStorage.setItem('accessToken', response.accessToken)
             localStorage.setItem('role', response.role)
             localStorage.setItem('isAuthorizedUser', 'true')
 
             const role: string = localStorage.getItem('role') || '';
 
-            const checkedRole: TProfile = checkRole(role)
+            const checkedRole: IProfile = checkRole(role)
 
             preloaderStore.loading = false
 
             router.push(checkedRole)
             
             return response
-        } catch (error) {
+        } catch (errors) {
             preloaderStore.loading = false
-            // errorsStore.showAndHideError()
-            errorsStore.errorAuth = true
-            console.error(error);
+            errorsStore.showAndHideAuthError()
+            console.error(errors);
         }
     }
 

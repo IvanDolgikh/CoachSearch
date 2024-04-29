@@ -1,7 +1,7 @@
 <template>
     <div class="filter-age">
         <div class="filter-age__container">
-            <Slider v-model="valueAge"
+            <Slider v-model="filtersStore.valueAge"
                 range
                 class="w-14rem"
                 :min="18"
@@ -15,14 +15,16 @@
 
 <script setup
     lang="ts">
-    import { ref, computed } from 'vue';
+    import { computed } from 'vue';
 
     import Slider from 'primevue/slider';
 
-    const valueAge = ref<number[]>([18, 80]);
+    import { useFiltersStore } from '../../../store/filtersStore';
+
+    const filtersStore = useFiltersStore()
 
     const showAge = computed<string>(() => {
-        const [from, to] = valueAge.value
+        const [from, to] = filtersStore.valueAge
         return `От ${from} до ${to}`
     })
 

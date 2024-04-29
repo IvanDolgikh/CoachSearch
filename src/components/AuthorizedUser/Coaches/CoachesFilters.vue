@@ -4,24 +4,23 @@
             <InputGroup>
                 <InputGroupAddon>
                     <FloatLabel>
-                        <InputText />
+                        <InputText v-model="filtersStore.inputSearchText" />
                         <label for="username">Найти</label>
                     </FloatLabel>
                 </InputGroupAddon>
 
-                <span></span>
-                <button class="coaches__search-button">
+                <button class="coaches__search-button"
+                    @click="filtersStore.isSearching = !filtersStore.isSearching">
                     <span class="pi pi-search"></span>
                 </button>
             </InputGroup>
 
             <button class="coaches__filter-button"
-                @click="isOpenModal = !isOpenModal">Фильтровать</button>
+                @click="filtersStore.isOpenModal = !filtersStore.isOpenModal">Фильтровать</button>
 
             <Transition name="modal-filter">
                 <KeepAlive>
-                    <CoachesFiltersModal v-if="isOpenModal"
-                        @close-modal="isOpenModal = !isOpenModal" />
+                    <CoachesFiltersModal v-if="filtersStore.isOpenModal" />
                 </KeepAlive>
 
             </Transition>
@@ -31,7 +30,6 @@
 
 <script setup
     lang="ts">
-    import { ref } from 'vue'
 
     import CoachesFiltersModal from "./CoachesFiltersModal.vue";
 
@@ -40,7 +38,9 @@
     import InputGroup from 'primevue/inputgroup';
     import InputGroupAddon from 'primevue/inputgroupaddon';
 
-    const isOpenModal = ref<boolean>(false)
+    import { useFiltersStore } from '../../../store/filtersStore';
+
+    const filtersStore = useFiltersStore()
 
 </script>
 

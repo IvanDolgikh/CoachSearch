@@ -1,8 +1,8 @@
 <template>
     <div class="filter-specialization">
         <div class="filter-specialization__container">
-            <SelectButton v-model="valueSpecialization"
-                :options="optionSpecialization"
+            <SelectButton v-model="filterStore.valueSpecialization"
+                :options="filterStore.optionSpecialization"
                 optionLabel="name"
                 multiple
                 aria-labelledby="multiple" />
@@ -12,29 +12,10 @@
 
 <script setup
     lang="ts">
-    import { reactive, ref } from 'vue';
-
     import SelectButton from 'primevue/selectbutton';
+    import { useFiltersStore } from "../../../store/filtersStore";
 
-    type TOptionSpecialization = {
-        name: string
-    }
-
-    const valueSpecialization = ref<TOptionSpecialization[]>([])
-
-    const optionSpecialization = reactive<TOptionSpecialization[]>([
-        { name: 'Йога' },
-        { name: 'Табата' },
-        { name: 'Велотренировки' },
-        { name: 'Pilates' },
-        { name: 'Кинезис' },
-        { name: 'TRX' },
-        { name: 'Танцевальные направления' },
-        { name: 'Единоборства' },
-        { name: 'Функциональные тренировки' },
-        { name: 'Силовые тренировки' },
-        { name: 'Растяжка' }
-    ])
+    const filterStore = useFiltersStore()
 
 </script>
 

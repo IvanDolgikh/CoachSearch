@@ -2,10 +2,10 @@
 
     <div class="preloader">
         <div class="preloader__container">
-            <ProgressSpinner style="width: 150px; height: 150px"
+            <ProgressSpinner style="width: 120px; height: 120px"
                 strokeWidth="3"
                 aria-label="Loading" />
-            <p class="preloader__title">Минутку я думаю...</p>
+            <p class="preloader__title">Минутку, я думаю...</p>
         </div>
     </div>
 
@@ -37,7 +37,7 @@
 
         &__title {
             margin-top: 20px;
-            font-size: 34px;
+            font-size: 28px;
         }
     }
 

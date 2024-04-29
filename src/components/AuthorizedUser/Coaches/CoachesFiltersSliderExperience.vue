@@ -1,7 +1,7 @@
 <template>
     <div class="filter-experience">
         <div class="filter-experience__container">
-            <Slider v-model="valueAmountExperience"
+            <Slider v-model="filtersStore.valueAmountExperience"
                 range
                 class="w-14rem"
                 :min="0"
@@ -15,14 +15,16 @@
 
 <script setup
     lang="ts">
-    import { ref, computed } from 'vue';
+    import { computed } from 'vue';
 
     import Slider from 'primevue/slider';
 
-    const valueAmountExperience = ref<number[]>([0, 50]);
+    import { useFiltersStore } from '../../../store/filtersStore';
+
+    const filtersStore = useFiltersStore()
 
     const showAmountExperience = computed<string>(() => {
-        const [from, to] = valueAmountExperience.value
+        const [from, to] = filtersStore.valueAmountExperience
         return `От ${from} до ${to}`
     })
 

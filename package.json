@@ -15,7 +15,7 @@
     "primevue": "^3.48.1",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5",
-    "vue-yandex-maps": "^2.0.0-rc.12"
+    "vue-yandex-maps": "^2.0.0-rc.8"
   },
   "devDependencies": {
     "@types/node": "^20.11.10",

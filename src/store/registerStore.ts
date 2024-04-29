@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import { sendData, baseUrl } from '@api/api.ts'
 import { usePreloaderStore } from './preloaderStore'
+import { useErrorsStore } from './errorsStore'
 import { ref, reactive, computed } from 'vue'
 
 
@@ -9,12 +10,13 @@ export const useRegisterStore = defineStore('register', () => {
 
     const router = useRouter()
     const preloaderStore = usePreloaderStore();
+    const errorsStore = useErrorsStore()
 
-    type TProfile = {
+    interface IProfile {
         name: string
     }
 
-    const checkRole = (role: string): TProfile => {
+    const checkRole = (role: string): IProfile => {
         if(role === 'Customer') {
             return {name: 'user-profile'}
         } else {
@@ -36,7 +38,6 @@ export const useRegisterStore = defineStore('register', () => {
     }
 
     interface IAdditionalDataTrainer {
-        specialization?: string,
         address?: string,
     }
 
@@ -56,13 +57,13 @@ export const useRegisterStore = defineStore('register', () => {
 
     // Убрать специализацию при регистрации!!!!
     const additionalDataTrainer = reactive<IAdditionalDataTrainer>({
-        specialization: '',
         address: '',
     })
 
+
     const userRole = ref<boolean>(false)
     
-    const checkUserRole = computed<string>(() => userRole.value ? 'trainer' : 'customer')
+    const checkUserRole = computed<string>(() => userRole.value ? 'coach' : 'customer')
 
     //TODO
     
@@ -82,29 +83,28 @@ export const useRegisterStore = defineStore('register', () => {
 
         try {
             // checkUserRole.value === 'customer' || checkUserRole.value === 'trainer' 
-            if(['customer', 'trainer'].includes(checkUserRole.value)) {
-                if(checkUserRole.value === 'trainer') {
-                    data.specialization = additionalDataTrainer['specialization'];
+            if(['customer', 'coach'].includes(checkUserRole.value)) {
+                if(checkUserRole.value === 'coach') {
                     data.address = additionalDataTrainer['address']
                 }
 
                 const response: any = await sendData(`${urlBase}/${checkUserRole.value}`, data)
-                localStorage.setItem('token', response.token)
+                localStorage.setItem('accessToken', response.accessToken)
                 localStorage.setItem('role', response.role)
 
                 const role: string = localStorage.getItem('role') || '';
-                const checkedRole: TProfile = checkRole(role)
+                const checkedRole: IProfile = checkRole(role)
                 preloaderStore.loading = false
 
                 router.push(checkedRole)
-                
                 return response
             } else {
                 console.log('Несуществующая роль')
             }
             
-        } catch(error) {
-            console.error(error);
+        } catch(error: any) {
+            preloaderStore.loading = false
+            errorsStore.showAndHideRegError(error.message)
         }
     }
 

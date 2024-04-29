@@ -2,7 +2,7 @@
     <div class="filter-best">
         <div class="filter-best__container">
             <div class="filter-best__radio-container">
-                <RadioButton v-model="valueSex"
+                <RadioButton v-model="filtersStore.valueBest"
                     inputId="man"
                     name="man"
                     value="man" />
@@ -10,7 +10,7 @@
                     class="ml-2">Да</label>
             </div>
             <div class="filter-best__radio-container">
-                <RadioButton v-model="valueSex"
+                <RadioButton v-model="filtersStore.valueBest"
                     inputId="woman"
                     name="woman"
                     value="woman" />
@@ -23,11 +23,13 @@
 
 <script setup
     lang="ts">
-    import { ref } from 'vue';
 
     import RadioButton from 'primevue/radiobutton';
 
-    const valueSex = ref<string>('')
+    import { useFiltersStore } from '../../../store/filtersStore';
+
+    const filtersStore = useFiltersStore();
+
 </script>
 
 <style lang="scss">

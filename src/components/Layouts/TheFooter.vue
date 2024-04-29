@@ -33,7 +33,7 @@
 @import "@variables";
 
 .main-footer {
-    background-color: #050505;
+    background-color: $color-dark;
 
     &__container {
         display: grid;

@@ -1,8 +1,9 @@
 <template>
-    <div class="error-auth">
-        <div class="error-auth__container">
+    <div class="error-reg">
+        <div class="error-reg__container">
             <span class="pi pi-exclamation-triangle"></span>
-            <p>Введен неверно логин или пароль</p>
+            <p v-if="errorsStore.errorPhoneReg">Пользователь с таким телефоном уже существует</p>
+            <p v-if="errorsStore.errorEmailReg">Пользователь с таким email уже существует</p>
         </div>
     </div>
 </template>
@@ -10,6 +11,9 @@
 <script lang="ts"
     setup>
 
+    import { useErrorsStore } from '../../store/errorsStore';
+
+    const errorsStore = useErrorsStore()
 </script>
 
 
@@ -18,7 +22,7 @@
 
     @import "@variables";
 
-    .error-auth {
+    .error-reg {
         &__container {
             display: flex;
             align-items: center;
@@ -36,7 +40,7 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
                 width: 20px;
-                height: 400px;
+                height: 500px;
                 background-color: red;
                 animation: border 10s linear infinite;
             }

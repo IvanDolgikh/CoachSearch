@@ -15,14 +15,14 @@
     <div class="coach__info">
       <p class="coach__fio">{{ coach.fullName }}</p>
       <p class="coach__specialization">
-        Специализация: <strong>{{ coach.specialization }}</strong>
+        Специализация: <strong>{{ specializations }}</strong>
       </p>
 
       <p class="coach__gym">
         Место: <strong>{{ coach.address }}</strong>
       </p>
       <div class="coach__button-container">
-        <router-link :to="{ name: 'coach', params: { trainerId: coach.trainerId } }"
+        <router-link :to="{ name: 'coach', params: { coachId: coach.coachId } }"
           class="coach__button-more">
           <span>Подробнее</span>
           <IconRightArrow class="coach__icon-right-arrow" />
@@ -30,7 +30,7 @@
 
         <div class="coach__like-container">
           <button class="coach__like-button coach_button_liked"
-            @click="addLike(coach.trainerId)">
+            @click="addLike()">
             <IconHeart class="coach__like-icon"
               :class="{ coach_button_liked: isLiked }" />
           </button>
@@ -44,34 +44,40 @@
 
 <script setup
   lang="ts">
-  import { ref } from "vue";
+  import { ref, computed } from "vue";
   import { baseUrl } from "@api/api.js";
 
   import IconRightArrow from "@icons-svg/icon-right-arrow.svg";
   import IconHeart from "@icons-svg/icon-heart.svg";
 
-  const urlLike: string = `${baseUrl}api/like`;
-
   interface IСoach {
-    trainerId: number;
+    coachId: string;
     address: string;
     avatarUrl: string;
     fullName: string;
     isLiked: boolean;
     likesCount: number;
-    specialization: string;
+    specializations: string[];
   }
 
   const props = defineProps<{
     coach: IСoach;
   }>();
 
+  const specializations = computed(() => {
+    if (props.coach.specializations) {
+      return props.coach.specializations.join(', ')
+    }
+  });
+
+  const urlLike: string = `${baseUrl}api/coach/like/${props.coach.coachId}`;
+
   const countLike = ref<number>(0);
   countLike.value = props.coach.likesCount;
   const isLiked = ref<boolean>(false);
   isLiked.value = props.coach.isLiked;
 
-  const addLike = async (id: number): Promise<void> => {
+  const addLike = async (): Promise<void> => {
     isLiked.value = !isLiked.value;
 
     if (isLiked.value === true) {
@@ -83,11 +89,8 @@
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify({
-        trainerId: id,
-      }),
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      }
     });
   };
 </script>

@@ -9,13 +9,13 @@ const CoachProfile = () => import("../components/AuthorizedUser/CoachProfile.vue
 const EditMode = () => import("../components/AuthorizedUser/EditProfile.vue");
 const Coaches = () => import("../components/AuthorizedUser/Coaches/CoachesList.vue");
 const Coach = () => import("../components/AuthorizedUser/CoachInfo/CoachInfo.vue");
-const Gyms = () => import("../components/AuthorizedUser/GymsList.vue");
 
 export const router = createRouter({
   history: createWebHistory("/CoachSearch/"),
   routes: [
     {
       path: "/",
+      name: "main",
       component: TheMain, // Компонент, который будет отображаться по умолчанию
     },
     {
@@ -48,14 +48,14 @@ export const router = createRouter({
           component: Coaches,
         },
         {
-          path: "coach/:trainerId",
+          path: "coach/:coachId",
           name: "coach",
           component: Coach,
         },
         {
-          path: "gyms",
-          name: "gyms",
-          component: Gyms,
+          path: "gyms-list",
+          name: "gyms-list",
+          component: () => import("../components/AuthorizedUser/GymsList.vue"),
         },
       ],
     },

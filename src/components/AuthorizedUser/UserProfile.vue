@@ -1,5 +1,8 @@
 <template>
     <div class="user">
+        <div class="user__logo-container">
+            <Logo class="user__logo" />
+        </div>
         <div class="user__container"
             v-if="data && !isEditable">
             <!-- <router-link class="user__edit-profile"
@@ -56,7 +59,10 @@
 
         <EditProfile v-if="isEditable"
             :userData="data"
-            @close-modal="isEditable = !isEditable" />
+            @close-modal="isEditable = !isEditable"
+            @update-data="updateData" />
+
+        <ErrorGetData v-if="errorsStore.errorGettingData" />
     </div>
 </template>
 
@@ -64,21 +70,26 @@
     lang="ts">
 
     import EditProfile from "./EditProfile.vue";
+    import ErrorGetData from "../Common/ErrorGetData.vue";
+    import Logo from '../Common/Logo.vue'
 
     import { ref, onMounted } from "vue";
     import { getData, baseUrl } from "@api/api.js";
     import { usePreloaderStore } from '../../store/preloaderStore'
+    import { useErrorsStore } from "../../store/errorsStore";
 
     import IconVk from "@icons-svg/icon-vk.svg";
     import IconTg from "@icons-svg/icon-tg.svg";
 
     const preloaderStore = usePreloaderStore();
+    const errorsStore = useErrorsStore()
 
     const isEditable = ref<boolean>(false)
 
     const url: string = `${baseUrl}api/customer/profile`;
 
     interface IData {
+        customerId: string
         avatarUrl: string;
         vkLink: string;
         telegramLink: string;
@@ -92,10 +103,21 @@
 
     const data = ref<IData>();
 
+    const getUserProfileData = async () => {
+        try {
+            const result = await getData(url)
+            data.value = result;
+            return result
+        } catch {
+            errorsStore.showAndHideGettingDataError()
+        }
+    }
+
+    const updateData = (newData: IData): IData => data.value = newData
+
     onMounted(async (): Promise<void> => {
         preloaderStore.loading = true
-        const result = await getData(url);
-        data.value = result;
+        getUserProfileData()
         preloaderStore.loading = false
     });
 </script>
@@ -105,6 +127,19 @@
     @import "@variables";
 
     .user {
+
+        &__logo-container {
+            width: 100%;
+            border-bottom: 1px solid $color-gray-lighter;
+            margin: 0 0 60px 0;
+            padding: 15px 0 15px 0;
+        }
+
+        &__logo {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
         &__container {
             position: relative;
             max-width: 1440px;

@@ -1,5 +1,8 @@
 <template>
     <div class="coach">
+        <div class="coach__logo-container">
+            <Logo class="coach__logo" />
+        </div>
         <div class="coach__container"
             v-if="dataTrainers">
 
@@ -12,7 +15,7 @@
                     alt="Фото Тренера">
                 <img class="coach__image"
                     v-else
-                    src="../../assets/images/mok/unknown.jpg"
+                    src="../../../assets/images/mok/unknown.jpg"
                     width="250"
                     height="250"
                     alt="">
@@ -31,7 +34,7 @@
                 <div class="coach__rating-container">
                     <div class="coach__like-container">
                         <button class="coach__like-button"
-                            @click="addLike(dataTrainers.trainerId)">
+                            @click="addLike()">
                             <IconHeart class="coach__like-icon"
                                 :class="{ 'coach_button_liked': isLiked }" />
                         </button>
@@ -64,10 +67,10 @@
 
             </div>
             <Map class="coach__map" />
-            <!-- слева пропс справа значение -->
+
             <CoachInfoCommentForm class="coach__comments"
                 id="comments"
-                :trainerId="trainerId"
+                :coachId="coachId"
                 :reviews="dataTrainers.reviews" />
 
         </div>
@@ -78,6 +81,7 @@
     lang="ts">
     import Map from '../../Lib/Map.vue';
     import CoachInfoCommentForm from './Comment/CoachInfoCommentForm.vue'
+    import Logo from '../../Common/Logo.vue'
 
     import { ref, computed, onMounted } from 'vue'
     import { useRoute } from 'vue-router';
@@ -114,13 +118,13 @@
         }
     }
 
-
-    const urlLike: string = `${baseUrl}api/like`
     const countLike = ref<number>(0)
     const isLiked = ref<boolean>(false)
-    const trainerId = computed<string>(() => route.params.trainerId as string);
+    const coachId = computed<string>(() => route.params.coachId as string);
 
-    const addLike = async (id: number): Promise<void> => {
+    const urlLike: string = `${baseUrl}api/coach/like/${coachId.value}`;
+
+    const addLike = async (): Promise<void> => {
         isLiked.value = !isLiked.value
 
         if (isLiked.value === true) {
@@ -133,21 +137,19 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + localStorage.getItem('token')
-            },
-            body: JSON.stringify({
-                trainerId: id
-            })
+                Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+            }
         })
     }
 
-    const url: string = `${baseUrl}api/trainer`
+    const url: string = `${baseUrl}api/coach`
 
     interface IReviews {
-        avatarUrl: string,
-        customerName: string,
-        reviewDate: string,
-        reviewText: string,
+        reviewId: string
+        customerAvatarUrl: string,
+        customerFullName: string,
+        dateCreated: string,
+        text: string,
     }
 
     interface IDataTrainers {
@@ -155,7 +157,7 @@
         vkLink: string,
         telegramLink: string,
         fullName: string,
-        trainerId: number,
+        coachId: string,
         reviews: IReviews[],
         phoneNumber: string,
         email: string,
@@ -170,7 +172,7 @@
 
     onMounted(async (): Promise<void> => {
         preloaderStore.loading = true
-        const result = await getData(`${url}/${trainerId.value}`)
+        const result = await getData(`${url}/${coachId.value}`)
         dataTrainers.value = result
         coordsStore.address = result.address
         countLike.value = result.likesCount
@@ -187,6 +189,19 @@
     @import '@variables';
 
     .coach {
+
+        &__logo-container {
+            width: 100%;
+            border-bottom: 1px solid $color-gray-lighter;
+            margin: 0 0 60px 0;
+            padding: 15px 0 15px 0;
+        }
+
+        &__logo {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
         &__container {
             max-width: 1440px;
             margin: 0 auto 10% auto;

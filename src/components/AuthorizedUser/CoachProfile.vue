@@ -1,7 +1,20 @@
 <template>
     <div class="coach">
+
+        <div class="coach__logo-container">
+            <Logo class="coach__logo" />
+        </div>
+
         <div class="coach__container"
             v-if="data && !isEditable">
+
+            <a href="#required-info"
+                class="coach__warning"
+                v-if="!data.isRegistrationFinished">
+                <span class="pi pi-exclamation-triangle"></span>
+                <p>Чтобы ваш профиль успешно отображался в списке тренеров,<br>завершите настройку своего профиля</p>
+            </a>
+
             <button class="coach__edit-profile"
                 @click="isEditable = !isEditable">Редактировать профиль</button>
 
@@ -18,10 +31,24 @@
                     width="250"
                     height="250"
                     alt="" />
+
                 <p class="coach__fio">{{ data.fullName }}</p>
-                <p class="coach__specialization">
-                    Специализация: <strong>{{ data.specialization }}</strong>
+
+                <p class="coach__age"
+                    v-if="data.age">
+                    Возраст: <strong>{{ `${data.age} лет` }}</strong>
                 </p>
+
+                <p class="coach__experience"
+                    v-if="data.workExperience">
+                    Опыт работы: <strong>{{ `${data.workExperience} лет` }}</strong>
+                </p>
+
+                <p class="coach__specialization"
+                    v-if="data.specializations">
+                    Специализация: <strong>{{ specializations }}</strong>
+                </p>
+
                 <div class="coach__link-container">
                     <a class="coach__social-link"
                         :href="data.vkLink">
@@ -53,12 +80,19 @@
                     <p class="coach__about-title">О себе</p>
                     <p class="coach__about">{{ data.info }}</p>
                 </div>
+
+                <CoachProfileRequiredInformation id="required-info"
+                    v-if="!data.isRegistrationFinished"
+                    @get-additional-data="getadditionalData" />
             </div>
         </div>
 
         <EditProfile v-if="isEditable"
             :userData="data"
-            @close-modal="isEditable = !isEditable" />
+            @close-modal="isEditable = !isEditable"
+            @update-data="updateData" />
+
+        <ErrorGetData v-if="errorsStore.errorGettingData" />
     </div>
 </template>
 
@@ -66,53 +100,120 @@
     lang="ts">
 
     import EditProfile from "./EditProfile.vue";
+    import ErrorGetData from "../Common/ErrorGetData.vue";
+    import Logo from '../Common/Logo.vue'
+    import CoachProfileRequiredInformation from './CoachProfileRequiredInformation.vue'
 
-    import { ref, onMounted } from "vue";
+    import { ref, onMounted, computed } from "vue";
     import { getData, baseUrl } from "@api/api.ts";
     import { usePreloaderStore } from '../../store/preloaderStore'
+    import { useErrorsStore } from "../../store/errorsStore";
 
     import IconVk from "@icons-svg/icon-vk.svg";
     import IconTg from "@icons-svg/icon-tg.svg";
 
     const preloaderStore = usePreloaderStore();
+    const errorsStore = useErrorsStore()
 
     const isEditable = ref<boolean>(false)
 
-    const url: string = `${baseUrl}api/trainer/profile`;
+    const url: string = `${baseUrl}api/coach/profile`;
 
-    interface Idata {
+    interface IData {
+        coachId: string
         avatarUrl: string;
         vkLink: string;
         telegramLink: string;
         fullName: string;
         phoneNumber: string;
         email: string;
-        specialization: string;
-        address: string;
         info: string;
+        address?: string;
+        specializations?: string[];
+        age?: number;
+        workExperience?: string;
+        isRegistrationFinished?: boolean
     }
 
-    // const data = ref<Idata | null>(null);
+    const data = ref<IData>();
 
-    const data = ref<Idata>();
+    const getCoachProfileData = async () => {
+        try {
+            const result = await getData(url)
+            data.value = result;
+            return result
+        } catch {
+            errorsStore.showAndHideGettingDataError()
+        }
+    }
+
+    const getadditionalData = (finishData: IData): IData => data.value = finishData
+
+    const specializations = computed(() => {
+        if (data.value?.specializations) {
+            return data.value.specializations.join(', ')
+        }
+    });
+
+    const updateData = (newData: IData): IData => data.value = newData
 
     onMounted(async (): Promise<void> => {
         preloaderStore.loading = true
-        const result = await getData(url);
-        data.value = result;
+        getCoachProfileData()
         preloaderStore.loading = false
     });
 </script>
 
 <style lang="scss"
     scoped>
+    @import "@variables";
+
     .coach {
-        @import "@variables";
+
+
+        &__logo-container {
+            width: 100%;
+            border-bottom: 1px solid $color-gray-lighter;
+            margin: 0 0 60px 0;
+            padding: 15px 0 15px 0;
+        }
+
+        &__logo {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        &__warning {
+            display: flex;
+            align-items: center;
+            column-gap: 30px;
+            width: fit-content;
+            margin: 0 auto 50px auto;
+            padding: 10px 30px;
+            background-color: $color-base-white;
+            border: none;
+            border-radius: 10px;
+            font-family: "Montserrat", sans-serif;
+            color: #4d4d4d;
+            font-weight: 300;
+            text-align: left;
+            line-height: 1.4;
+            cursor: pointer;
+
+            p {
+                font-size: 20px;
+            }
+
+            span {
+                font-size: 26px;
+                color: $color-accent;
+            }
+        }
 
         &__container {
             max-width: 1440px;
             padding: 0 80px;
-            margin: 7% auto 10% auto;
+            margin: 0 auto 10% auto;
         }
 
         &__edit-profile {
@@ -127,10 +228,10 @@
         }
 
         &__base-info-container {
-            text-align: center;
             display: grid;
             grid-template-columns: min-content 1fr;
-            grid-template-rows: min-content min-content 1fr;
+            grid-template-rows: repeat(4, min-content);
+            justify-content: start;
             column-gap: 40px;
             margin-bottom: 40px;
 
@@ -139,27 +240,32 @@
                 object-fit: cover;
                 border-radius: 20px;
                 grid-column: 1;
-                grid-row: 1 / 4;
+                grid-row: 1 / 5;
             }
 
             .coach__fio {
                 font-size: 30px;
-                text-align: start;
                 margin: 20px 0;
             }
 
             .coach__specialization {
-                text-align: start;
                 font-size: 20px;
-                margin-bottom: 40px;
+                line-height: 1.5;
+            }
+
+            .coach__age,
+            .coach__experience {
+                font-size: 20px;
+                margin-bottom: 10px
             }
 
             .coach__link-container {
-                grid-column: 2;
+                grid-column: 1;
+                margin-top: 20px;
                 height: fit-content;
                 display: flex;
                 column-gap: 20px;
-                justify-self: start;
+                justify-self: center;
             }
         }
 
@@ -194,7 +300,7 @@
             }
 
             .coach__about-container {
-                margin-left: 22px;
+                margin: 0 0 40px 22px;
             }
 
             .coach__about {

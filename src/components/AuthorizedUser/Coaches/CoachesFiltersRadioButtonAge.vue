@@ -2,7 +2,7 @@
     <div class="filter-sex">
         <div class="filter-sex__container">
             <div class="filter-sex__radio-container">
-                <RadioButton v-model="valueSex"
+                <RadioButton v-model="filtersStore.valueGender"
                     inputId="man"
                     name="man"
                     value="man" />
@@ -10,7 +10,7 @@
                     class="ml-2">Мужской</label>
             </div>
             <div class="filter-sex__radio-container">
-                <RadioButton v-model="valueSex"
+                <RadioButton v-model="filtersStore.valueGender"
                     inputId="woman"
                     name="woman"
                     value="woman" />
@@ -23,11 +23,14 @@
 
 <script setup
     lang="ts">
-    import { ref } from 'vue';
 
     import RadioButton from 'primevue/radiobutton';
 
-    const valueSex = ref<string>('')
+    import { useFiltersStore } from '../../../store/filtersStore';
+
+    const filtersStore = useFiltersStore()
+
+
 </script>
 
 <style lang="scss">
@@ -54,5 +57,10 @@
     .p-radiobutton .p-radiobutton-box .p-radiobutton-icon {
         background-color: $color-accent-middle;
     }
+
+    .required-information .p-highlight {
+        background-color: transparent;
+    }
+
 }
 </style>
