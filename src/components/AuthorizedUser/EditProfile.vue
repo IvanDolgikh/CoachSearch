@@ -237,7 +237,7 @@
 
     const updateProfile = async (): Promise<ICommonData> => {
         preloaderStore.loading = true
-        const data: ICommonData = {
+        const data = {
             email: email.value,
             phoneNumber: phoneNumber.value,
             fullName: fullName.value,
