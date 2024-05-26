@@ -4,8 +4,7 @@
 
             <router-link class="logo__link"
                 to="/">
-                <img src="../../assets/images/svg/icon-logo.svg"
-                    alt="Логотп CoachSearch" />
+                <IconLogo />
             </router-link>
 
 
@@ -15,6 +14,8 @@
 
 <script lang="ts"
     setup>
+
+    import IconLogo from "@icons-svg/icon-logo.svg"
 </script>
 
 <style lang="scss"
@@ -24,7 +25,7 @@
             width: fit-content;
         }
 
-        &__link img {
+        &__link {
             display: block;
             width: 60px;
             height: 60px;
