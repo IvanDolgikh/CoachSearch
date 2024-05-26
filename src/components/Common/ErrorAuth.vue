@@ -16,8 +16,6 @@
 <style lang="scss"
     scoped>
 
-    @import "@variables";
-
     .error-auth {
         &__container {
             display: flex;
