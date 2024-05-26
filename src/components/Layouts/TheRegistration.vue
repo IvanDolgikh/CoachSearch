@@ -204,8 +204,8 @@
                 padding: 24px;
             }
 
-            @include vp-1199 {
-                padding: 18px;
+            @include vp-767 {
+                padding: 18px 18px 30px 18px;
             }
         }
 

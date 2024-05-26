@@ -178,6 +178,8 @@
         &__question {
             font-size: 14px;
             font-weight: 400;
+            color: $color-base-text;
+
 
             @include vp-1199 {
                 font-size: 12px;
