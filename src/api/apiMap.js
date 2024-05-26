@@ -22,11 +22,10 @@ const initMap = async(array) => {
                 const pl = new ymaps.Placemark(array[i], {}, {
                     preset: 'islands#redIcon'
                 });
-                console.log(array[i], pl)
                 map.geoObjects.add(pl);
             }
         }
-
+        map.container.fitToViewport()
         map.controls.remove('trafficControl');
         map.controls.remove('typeSelector');
         map.controls.remove('rulerControl');

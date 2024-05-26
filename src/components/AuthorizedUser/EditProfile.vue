@@ -7,11 +7,12 @@
                 <span class="pi pi-times"></span>
             </button>
             <form class="user-edit__form"
-                method="post">
-                <div class="user-edit__base-data base-data">
-                    <span class="base-data__title">Личная информация</span>
+                method="post"
+                @submit.prevent="updateProfile()">
+                <div class="user-edit__base-data-container">
+                    <p class="user-edit__title">Личная информация</p>
 
-                    <label class="base-data__input-container">
+                    <label class="user-edit__input-container">
                         <span>ФИО</span>
                         <input type="text"
                             v-model="fullName"
@@ -19,7 +20,7 @@
                             required />
                     </label>
 
-                    <label class="base-data__input-container">
+                    <label class="user-edit__input-container">
                         <span>Номер телефона</span>
                         <input type="tel"
                             v-model="phoneNumber"
@@ -28,7 +29,7 @@
                             maxlength="11" />
                     </label>
 
-                    <label class="base-data__input-container">
+                    <label class="user-edit__input-container">
                         <span>Электронная почта</span>
                         <input type="Email"
                             v-model="email"
@@ -36,7 +37,7 @@
                             required />
                     </label>
 
-                    <label class="base-data__input-textarea-container">
+                    <label class="user-edit__input-textarea-container">
                         <span>Расскажите о себе</span>
                         <textarea name="Info"
                             v-model="info"
@@ -47,7 +48,7 @@
 
 
                     <div v-if="role === 'Coach'">
-                        <label class="base-data__input-container">
+                        <label class="user-edit__input-container">
                             <span>Возраст</span>
                             <input type="text"
                                 v-model="age"
@@ -56,7 +57,7 @@
                                 maxlength="2" />
                         </label>
 
-                        <label class="base-data__input-container">
+                        <label class="user-edit__input-container">
                             <span>Опыт работы</span>
                             <input type="text"
                                 v-model="workExperience"
@@ -65,26 +66,26 @@
                                 maxlength="2" />
                         </label>
 
-                        <label class="base-data__input-container">
-                            <span>Место проведения<br />тренировок</span>
+                        <label class="user-edit__input-container">
+                            <span>Место проведения тренировок</span>
                             <input type="text"
                                 v-model="address"
                                 name="Address"
                                 required />
                         </label>
 
-                        <label class="base-data__input-container">
-                            <span>Специализация</span>
+                        <label class="user-edit__input-container">
+                            <p class="user-edit__title">Специализация</p>
                             <CoachesFiltersSelectButton />
 
                         </label>
                     </div>
                 </div>
 
-                <div class="user-edit__social social">
-                    <label class="social__input-image-container">
-                        <span class="social__title">Ваше фото</span>
-                        <img class="social__custom-input-image"
+                <div class="user-edit__social">
+                    <label class="user-edit__input-image-container">
+                        <p class="user-edit__title">Ваше фото</p>
+                        <img class="user-edit__custom-input-image"
                             :src="checkTypeAvatar"
                             alt="" />
                         <input type="file"
@@ -93,16 +94,16 @@
                             @change="readSrc" />
                     </label>
 
-                    <span class="social__title">Профили в соцсетях</span>
+                    <p class="user-edit__title">Профили в соцсетях</p>
 
-                    <label class="social__input-container">
+                    <label class="user-edit__input-container">
                         <span>Вконтакте</span>
                         <input type="text"
                             v-model="vkLink"
                             name="VkLink" />
                     </label>
 
-                    <label class="social__input-container">
+                    <label class="user-edit__input-container">
                         <span>Телеграмм</span>
                         <input type="text"
                             v-model="telegramLink"
@@ -110,8 +111,7 @@
                     </label>
                 </div>
 
-                <button class="user-edit__button"
-                    @click.prevent="updateProfile()">
+                <button class="user-edit__button">
                     Сохранить
                 </button>
 
@@ -124,17 +124,19 @@
 <script lang="ts"
     setup>
 
-    import { ref, computed } from 'vue'
+    import { ref, computed, toRefs } from 'vue'
 
     import CoachesFiltersSelectButton from './Coaches/CoachesFiltersSelectButton.vue';
 
     import { useFiltersStore } from '../../store/filtersStore';
+    import { usePreloaderStore } from '../../store/preloaderStore'
 
     import { sendData, baseUrl } from '@api/api';
 
     const emit = defineEmits(['close-modal', 'update-data'])
 
     const filtersStore = useFiltersStore()
+    const preloaderStore = usePreloaderStore();
 
     const role: string = localStorage.getItem("role") || "";
 
@@ -163,12 +165,29 @@
     }
 
     const props = defineProps<{
-        userData: ICommonData | undefined,
+        userData: ICommonData,
     }>()
+
+    type TAvatarShow = string | File | ArrayBuffer
+
+    const {
+        avatarUrl: avatar,
+        vkLink,
+        telegramLink,
+        fullName,
+        phoneNumber,
+        email,
+        info,
+        address,
+        age,
+        workExperience,
+    } = toRefs(props.userData)
+
+    const avatarShow = ref<TAvatarShow>(avatar.value);
 
     // Для отображения раннее выбранных специализаций
     const getCompletedSpecializations = computed<ICompletedSpecializations[]>(() => {
-        const spec = props.userData?.specializations
+        const spec: string[] | undefined = props.userData?.specializations
         const arrCompletedSpecializations: ICompletedSpecializations[] = []
         if (spec) {
             for (let i = 0; i < spec.length; i++) {
@@ -180,25 +199,8 @@
 
     filtersStore.valueSpecialization = getCompletedSpecializations.value
 
-    const avatar = ref<string | File | ArrayBuffer>(props.userData?.avatarUrl ?? '')
-    const vkLink = ref<string>(props.userData?.vkLink ?? '')
-    const telegramLink = ref<string>(props.userData?.telegramLink ?? '')
-    const fullName = ref<string>(props.userData?.fullName ?? '')
-    const phoneNumber = ref<string>(props.userData?.phoneNumber ?? '')
-    const email = ref<string>(props.userData?.email ?? '')
-    const info = ref<string>(props.userData?.info ?? '')
-
-    const address = ref<string>(props.userData?.address ?? '')
-    const age = ref<number>(props.userData?.age ?? 0)
-    const workExperience = ref<string>(props.userData?.workExperience ?? '')
-
-
-    type TAvatarShow = string | File | ArrayBuffer
-
-    const avatarShow = ref<TAvatarShow>(avatar.value);
-
     const readSrc = (evt: Event) => {
-        const file = (evt.target as HTMLInputElement)?.files?.[0];
+        const file: File | undefined = (evt.target as HTMLInputElement).files?.[0];
 
         if (file) {
             avatar.value = file;
@@ -226,14 +228,15 @@
         }
 
         else {
-            return avatarShow.value.toString();
+            return avatarShow.value as string
         }
     });
 
     const urlUpdateCustomer: string = `${baseUrl}api/customer/profile`
     const urlUpdateCoach: string = `${baseUrl}api/coach/profile`
 
-    const updateProfile = async (): Promise<void> => {
+    const updateProfile = async (): Promise<ICommonData> => {
+        preloaderStore.loading = true
         const data: ICommonData = {
             email: email.value,
             phoneNumber: phoneNumber.value,
@@ -243,12 +246,12 @@
             vkLink: vkLink.value,
             avatar: avatar.value,
             specializations: filtersStore.valueSpecialization.map(item => item.name),
-            address: address.value,
-            age: age.value,
-            workExperience: workExperience.value,
+            address: address?.value,
+            age: age?.value,
+            workExperience: workExperience?.value,
         }
 
-        let result: any
+        let result: ICommonData
 
         if (localStorage.getItem('role') === 'Customer') {
             result = await sendData(urlUpdateCustomer, data)
@@ -256,74 +259,32 @@
             result = await sendData(urlUpdateCoach, data)
         }
 
+        filtersStore.valueSpecialization = []
+
         emit('close-modal')
 
         emit('update-data', result)
-
+        preloaderStore.loading = false
         return result
     }
-
-    // const updateCoachProfile = async () => {
-    //     const data: ICommonData = {
-    //         email: email.value,
-    //         phoneNumber: phoneNumber.value,
-    //         fullName: fullName.value,
-    //         info: info.value,
-    //         telegramLink: telegramLink.value,
-    //         vkLink: vkLink.value,
-    //         avatar: avatar.value,
-    //         specializations: filtersStore.valueSpecialization.map(item => item.name),
-    //         address: address.value,
-    //         age: age.value,
-    //         workExperience: workExperience.value,
-    //     }
-
-    //     const result = await sendData(urlUpdateCoach, data)
-
-    //     emit('close-modal')
-
-    //     emit('update-data', result)
-
-    // }
 
 </script>
 
 <style lang="scss">
-@import "@variables";
-
 .user-edit {
 
     &__container {
         background-color: $color-bg-default;
         padding: 0 80px;
-        margin: 7% auto 10% auto;
-    }
+        margin: 0 auto 10% auto;
 
-    input {
-        width: 80%;
-        background-color: transparent;
-        border: none;
-        border-bottom: 1px solid #333333;
-        color: rgb(51, 51, 51);
-        font-size: 18px;
-        padding: 3px 5px 3px 5px;
-
-        &:focus-visible {
-            outline: none;
+        @include vp-1199 {
+            padding: 0 60px;
         }
-    }
 
-    span {
-        display: block;
-        color: rgb(51, 51, 51);
-        font-size: 18px;
-        margin-bottom: 15px;
-        font-weight: 500;
-    }
-
-    span.base-data__title {
-        font-size: 26px;
-        margin-bottom: 40px;
+        @include vp-767 {
+            padding: 0 20px;
+        }
     }
 
     &__form {
@@ -331,24 +292,75 @@
         grid-template-columns: 1fr 1fr;
         column-gap: 40px;
         position: relative;
+
+        @include vp-767 {
+            display: flex;
+            flex-direction: column;
+        }
     }
 
-    &__social {
-        grid-column: 2;
+    &__title {
+        font-size: 26px;
+        margin-bottom: 40px;
+        color: $color-base-text;
+        font-weight: 500;
+
+        @include vp-1199 {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        @include vp-767 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
     }
 
-    &__button {
-        grid-column: 1 / 3;
-        width: 40%;
-        margin: 30px auto 0 auto;
-        display: block;
-        background-color: #474747;
-        color: rgb(255 255 255);
+    input {
+        width: 80%;
+        background-color: transparent;
         border: none;
-        border-radius: 10px;
-        font-size: 20px;
-        padding: 12px 30px;
-        cursor: pointer;
+        border-bottom: 1px solid $color-dark;
+        color: $color-base-text;
+        font-size: 18px;
+        padding: 3px 5px 3px 5px;
+        transition: border 0.2s;
+
+        &:hover,
+        &:focus-visible {
+            outline: none;
+            border-color: $color-accent-middle;
+            transition: border 0.2s;
+        }
+
+        &:active {
+            border-color: $color-accent-lighter;
+        }
+
+        @include vp-1199 {
+            font-size: 16px;
+        }
+
+        @include vp-767 {
+            font-size: 14px;
+        }
+    }
+
+    span {
+        display: block;
+        color: $color-base-text;
+        font-size: 18px;
+        margin-bottom: 14px;
+        font-weight: 500;
+
+        @include vp-1199 {
+            font-size: 16px;
+        }
+
+        @include vp-767 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
     }
 
     &__button-cancel {
@@ -358,64 +370,100 @@
         border: none;
         cursor: pointer;
         margin-left: auto;
+        padding: 0;
 
         span {
             font-size: 28px;
             color: $color-gray-lighter;
         }
+
+        @include vp-1199 {
+            span {
+                font-size: 24px;
+            }
+        }
+
+        @include vp-1199 {
+            span {
+                font-size: 22px;
+            }
+        }
+    }
+
+    &__social {
+        grid-column: 2;
     }
 
     .p-button {
         background: $color-base-white;
-        border-radius: 10px;
 
         span {
             margin: 0;
-        }
-
-        &::before {
-            display: none;
         }
 
         &.p-highlight {
             background-color: $color-accent-lighter;
         }
     }
-}
 
-.base-data {
 
     &__input-container {
         display: block;
         margin-bottom: 30px;
+
+        @include vp-1199 {
+            margin-bottom: 24px;
+        }
+
+        @include vp-767 {
+            margin-bottom: 20px;
+        }
     }
 
     &__input-textarea-container {
         display: block;
-        margin-bottom: 15px;
+        margin-bottom: 30px;
+
+        @include vp-1199 {
+            margin-bottom: 24px;
+        }
+
+        @include vp-767 {
+            margin-bottom: 20px;
+        }
 
         textarea {
             background-color: transparent;
             resize: none;
-            color: rgb(51, 51, 51);
-            font-size: 20px;
+            color: $color-base-text;
+            font-size: 18px;
             padding: 3px 5px 3px 5px;
-            border: 1px solid 1px solid #333333;
+            border: 1px solid $color-dark;
             border-radius: 10px;
             width: 80%;
+            transition: border 0.2s;
 
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
+
+            &:hover,
             &:focus-visible {
                 outline: none;
+                border-color: $color-accent-middle;
+                transition: border 0.2s;
+            }
+
+            &:active {
+                border-color: $color-accent-lighter;
             }
         }
     }
-}
 
-.social {
-    &__input-container {
-        display: block;
-        margin-bottom: 30px;
-    }
 
     &__input-image-container {
         display: block;
@@ -426,6 +474,10 @@
             padding: 0;
             border: 0;
         }
+
+        @include vp-767 {
+            margin-bottom: 20px;
+        }
     }
 
     &__custom-input-image {
@@ -435,26 +487,53 @@
         background-color: rgb(216, 216, 216);
         object-fit: cover;
         cursor: pointer;
+
+        @include vp-1199 {
+            width: 160px;
+            height: 160px;
+        }
+
+        @include vp-767 {
+            width: 120px;
+            height: 120px;
+        }
     }
 
-    span.social__title {
-        font-size: 26px;
-        margin-bottom: 40px;
+
+    &__button {
+        display: block;
+        grid-column: 1 / 3;
+        width: 40%;
+        margin: 30px auto 0 auto;
+        background-color: #474747;
+        color: $color-base-white;
+        border: none;
+        border-radius: 10px;
+        font-size: 20px;
+        padding: 12px 30px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        @include vp-1199 {
+            font-size: 16px;
+            padding: 8px 22px;
+        }
+
+        @include vp-767 {
+            font-size: 14px;
+            padding: 8px 18px;
+        }
+
+        &:hover,
+        &:focus-visible {
+            outline: none;
+            background-color: $color-accent-middle;
+            transition: background-color 0.2s;
+        }
+
+        &:active {
+            background-color: $color-accent-lighter;
+        }
     }
-}
-
-
-.slide-fade-enter-active {
-    transition: all 0.3s ease-out;
-}
-
-.slide-fade-leave-active {
-    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-    transform: translateY(40px);
-    opacity: 0;
 }
 </style>

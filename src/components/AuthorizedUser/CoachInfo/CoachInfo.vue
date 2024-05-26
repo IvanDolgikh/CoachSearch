@@ -20,7 +20,7 @@
                     height="250"
                     alt="">
                 <p class="coach__fio">{{ dataTrainers.fullName }}</p>
-                <p class="coach__specialization">Специализация: <strong>{{ dataTrainers.specialization }}</strong></p>
+                <p class="coach__specialization"><span>Специализация:</span> <strong>{{ specializations }}</strong></p>
                 <div class="coach__link-container">
                     <a class="coach__social-link"
                         :href="dataTrainers.vkLink">
@@ -46,39 +46,47 @@
                             <IconComment class="coach__comment-icon" />
                         </a>
                         <span class="coach__comment-amout">{{ !dataTrainers.reviews ? 0 :
-                JSON.parse(JSON.stringify(dataTrainers.reviews)).length }}</span>
+                dataTrainers.reviews.length }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="coach__additional-info-container">
-                <div class="coach__contacts-container">
-                    <p class="coach__contacts-title">Контактная информация</p>
-                    <p class="coach__tel">Телефон: <strong>{{ dataTrainers.phoneNumber }}</strong></p>
-                    <p class="coach__email">Эл почта: <strong>{{ dataTrainers.email }}</strong></p>
-                    <p class="coach__address">Место проведения тренировок: <strong>{{ dataTrainers.address }}</strong>
-                    </p>
-                </div>
 
-                <div class="coach__about-container">
-                    <p class="coach__about-title">О себе</p>
-                    <p class="coach__about">{{ dataTrainers.info }}</p>
-                </div>
-
+            <div class="coach__contacts-container">
+                <p class="coach__contacts-title">Контактная информация</p>
+                <p class="coach__tel">Телефон: <strong>{{ dataTrainers.phoneNumber }}</strong></p>
+                <p class="coach__email">Эл почта: <strong>{{ dataTrainers.email }}</strong></p>
+                <p class="coach__address">Место проведения тренировок: <strong>{{ dataTrainers.address }}</strong>
+                </p>
             </div>
-            <Map class="coach__map" />
+
+            <div class="coach__about-container">
+                <p class="coach__about-title">О себе</p>
+                <p class="coach__about">{{ dataTrainers.info }}</p>
+            </div>
+
+
+            <div class="coach__map">
+                <Map />
+            </div>
 
             <CoachInfoCommentForm class="coach__comments"
                 id="comments"
                 :coachId="coachId"
                 :reviews="dataTrainers.reviews" />
-
         </div>
+        <ErrorGetData v-if="errorsStore.errorGettingData" />
+
+        <Transition name="error-like">
+            <ErrorLike v-if="errorsStore.errorLeaveLike" />
+        </Transition>
     </div>
 </template>
 
 <script setup
     lang="ts">
+    import ErrorGetData from "../../Common/ErrorGetData.vue";
+    import ErrorLike from "../../Common/ErrorLike.vue"
     import Map from '../../Lib/Map.vue';
     import CoachInfoCommentForm from './Comment/CoachInfoCommentForm.vue'
     import Logo from '../../Common/Logo.vue'
@@ -87,6 +95,7 @@
     import { useRoute } from 'vue-router';
     import { useCoordsStore } from '../../../store/coordsStore'
     import { usePreloaderStore } from '../../../store/preloaderStore'
+    import { useErrorsStore } from "../../../store/errorsStore";
     import { getData, baseUrl } from '@api/api.js'
     import { initMap } from '@api/apiMap.js'
 
@@ -97,6 +106,8 @@
 
     const coordsStore = useCoordsStore();
     const preloaderStore = usePreloaderStore();
+    const errorsStore = useErrorsStore();
+
     const route = useRoute();
 
     const APIKEY: string = 'b9792c26-9b3a-42d8-a4f6-5160e8801ffc';
@@ -105,9 +116,9 @@
         try {
             const urlAddress: string = `https://geocode-maps.yandex.ru/1.x/?apikey=${APIKEY}&format=json&geocode=${coordsStore.address}`;
 
-            const response = await fetch(urlAddress)
+            const response: any = await fetch(urlAddress)
             if (response.ok) {
-                const data = await response.json()
+                const data: any = await response.json()
                 const coordinates: string[] = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
                 coordsStore.coords[0] = Number(coordinates[1])
                 coordsStore.coords[1] = Number(coordinates[0])
@@ -125,22 +136,30 @@
     const urlLike: string = `${baseUrl}api/coach/like/${coachId.value}`;
 
     const addLike = async (): Promise<void> => {
-        isLiked.value = !isLiked.value
 
-        if (isLiked.value === true) {
-            ++countLike.value
-        }
-        else {
-            --countLike.value
-        }
-        fetch(urlLike, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+        try {
+
+            const response: any = await fetch(urlLike, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                }
+            });
+
+            if (response.ok) {
+
+                isLiked.value = !isLiked.value
+                isLiked.value === true ? ++countLike.value : --countLike.value
+
+            } else {
+                throw Error
             }
-        })
-    }
+
+        } catch (error: any) {
+            errorsStore.showAndHideLeaveLikeError()
+        }
+    };
 
     const url: string = `${baseUrl}api/coach`
 
@@ -162,22 +181,35 @@
         phoneNumber: string,
         email: string,
         info: string,
-        specialization: string,
+        specializations: string[],
         address: string,
     }
 
-    // const dataTrainers = ref<IdataTrainers | null>(null)
-
     const dataTrainers = ref<IDataTrainers>()
+
+    const specializations = computed<string>(() => {
+        if (dataTrainers.value?.specializations) {
+            return dataTrainers.value.specializations.join(', ')
+        }
+        return ''
+    });
+
+    const getCoachInfo = async (): Promise<void> => {
+        try {
+            const result = await getData(`${url}/${coachId.value}`)
+            dataTrainers.value = result
+            coordsStore.address = result.address
+            countLike.value = result.likesCount
+            isLiked.value = result.isLiked
+            getCoords()
+        } catch (error: any) {
+            errorsStore.showAndHideGettingDataError()
+        }
+    }
 
     onMounted(async (): Promise<void> => {
         preloaderStore.loading = true
-        const result = await getData(`${url}/${coachId.value}`)
-        dataTrainers.value = result
-        coordsStore.address = result.address
-        countLike.value = result.likesCount
-        isLiked.value = result.isLiked
-        getCoords()
+        await getCoachInfo()
         preloaderStore.loading = false
     })
 
@@ -186,35 +218,62 @@
 
 <style lang="scss"
     scoped>
-    @import '@variables';
 
     .coach {
+        flex-grow: 1;
 
         &__logo-container {
             width: 100%;
             border-bottom: 1px solid $color-gray-lighter;
-            margin: 0 0 60px 0;
-            padding: 15px 0 15px 0;
+            margin-bottom: 60px;
+            padding: 15px 100px;
+
+            @include vp-1199 {
+                margin-bottom: 40px;
+                padding: 10px 60px;
+            }
+
+            @include vp-767 {
+                margin-bottom: 30px;
+                padding: 8px 20px;
+            }
         }
 
         &__logo {
-            max-width: 1440px;
-            margin: 0 auto;
+            width: fit-content;
+            margin-left: auto;
         }
 
         &__container {
             max-width: 1440px;
-            margin: 0 auto 10% auto;
             padding: 0 80px;
+            margin: 0 auto 10% auto;
+
+            @include vp-1199 {
+                padding: 0 60px;
+            }
+
+            @include vp-767 {
+                padding: 0 20px;
+            }
         }
 
         &__base-info-container {
-            text-align: center;
             display: grid;
-            grid-template-columns: min-content 1fr min-content;
-            grid-template-rows: min-content min-content 1fr;
+            grid-template-columns: min-content 1fr;
+            grid-template-rows: repeat(3, min-content);
+            justify-content: start;
             column-gap: 40px;
             margin-bottom: 40px;
+
+            @include vp-1199 {
+                margin-bottom: 26px;
+            }
+
+            @include vp-767 {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         &__image {
@@ -223,79 +282,187 @@
             border-radius: 20px;
             grid-column: 1;
             grid-row: 1 / 4;
+
+            @include vp-1199 {
+                width: 180px;
+                height: 180px;
+            }
+
+            @include vp-767 {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto 20px auto;
+                order: 1;
+
+            }
         }
 
         &__fio {
             font-size: 30px;
             text-align: start;
             margin: 20px 0;
+
+            @include vp-1199 {
+                font-size: 26px;
+                margin: 14px 0 16px 0;
+                grid-column: 2 / 4;
+            }
+
+            @include vp-767 {
+                font-size: 22px;
+                text-align: center;
+                margin: 0 0 14px 0;
+                order: 2;
+            }
         }
 
         &__specialization {
-            text-align: start;
-            font-size: 20px;
-            margin-bottom: 40px;
-            grid-column: 2;
+            font-size: 18px;
+
+            @include vp-1199 {
+                font-size: 16px;
+                grid-row: 2;
+                grid-column: 2 / 4;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+                order: 3;
+                text-align: center;
+                margin-bottom: 12px;
+
+                span {
+                    display: none;
+                }
+            }
         }
 
         &__link-container {
-            grid-column: 2;
+            grid-column: 1;
+            margin-top: 20px;
             height: fit-content;
             display: flex;
             column-gap: 20px;
-            justify-self: start;
+            justify-self: center;
+
+            @include vp-1199 {
+                column-gap: 14px;
+                margin-top: 16px;
+            }
+
+            @include vp-767 {
+                margin: 0 auto;
+                order: 3;
+            }
         }
 
-        &__additional-info-container {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            row-gap: 10px;
+        &__social-icon {
+            width: 48px;
+            height: 48px;
+
+            @include vp-1199 {
+                width: 40px;
+                height: 40px;
+            }
+
+            @include vp-767 {
+                width: 32px;
+                height: 32px;
+            }
         }
 
         &__contacts-container {
             padding: 22px;
             border-radius: 20px;
             background-color: #e2e2e2;
-            margin-bottom: 30px;
             display: flex;
             flex-direction: column;
-            row-gap: 20px;
+            row-gap: 18px;
+            margin-bottom: 40px;
+
+            @include vp-1199 {
+                padding: 18px;
+                row-gap: 14px;
+                margin-bottom: 26px;
+            }
+
+            @include vp-767 {
+                row-gap: 12px;
+            }
         }
 
         &__tel,
         &__email,
         &__address {
-            font-size: 20px;
+            font-size: 18px;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
         }
 
-        &__specialization-container {
-            padding: 22px;
-            border-radius: 20px;
-            background-color: #e2e2e2;
-            margin-bottom: 30px;
+
+        &__address,
+        &__specialization {
+            line-height: 1.5;
         }
 
         &__about-container {
-            margin-left: 22px;
-            margin: 0 0 50px 22px;
+            margin: 0 0 40px 22px;
+
+            @include vp-1199 {
+                margin: 0 0 30px 18px;
+                margin-left: 18px;
+            }
         }
 
         &__about {
-            font-size: 20px;
+            font-size: 18px;
             border-bottom: 1px solid $color-gray-lighter;
             padding-bottom: 10px;
-            line-height: 1.6;
+            line-height: 1.5;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
         }
 
         &__contacts-title,
         &__about-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 22px;
+            margin-bottom: 8px;
             font-weight: 600;
+
+            @include vp-1199 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            @include vp-767 {
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
         }
 
+        &__about-title {
+            margin-bottom: 18px;
+
+            @include vp-1199 {
+                margin-bottom: 14px;
+            }
+
+            @include vp-767 {
+                margin-bottom: 12px;
+            }
+        }
 
         strong {
             font-weight: 500;
@@ -308,28 +475,20 @@
             width: 100%;
         }
 
-        &__like-icon {
-            fill: $color-gray-lighter;
-        }
-
-        &__comment-icon {
-            stroke: $color-gray-lighter;
-            fill: $color-gray-lighter;
-        }
-
-        &_button_liked {
-            fill: rgb(255, 104, 104);
-        }
-
         &__map {
+            min-width: auto;
+            width: 100%;
             display: block;
-            grid-column: 1 / 3;
             border-radius: 10px;
             margin-bottom: 50px;
-        }
 
-        &__comments {
-            grid-column: 1 / 3;
+            @include vp-1199 {
+                margin-bottom: 40px;
+            }
+
+            @include vp-767 {
+                margin-bottom: 30px;
+            }
         }
 
         &__rating-container {
@@ -350,8 +509,25 @@
 
             span {
                 display: block;
-                font-size: 20px;
+                font-size: 18px;
                 color: $color-base-text;
+                font-weight: 400;
+            }
+
+            @include vp-1199 {
+                grid-row: 4;
+
+                span {
+                    font-size: 16px;
+                }
+            }
+
+            @include vp-767 {
+                order: 0;
+
+                span {
+                    font-size: 14px;
+                }
             }
         }
 
@@ -361,6 +537,45 @@
             justify-content: flex-end;
             align-items: center;
             column-gap: 6px;
+
+            @include vp-767 {
+                column-gap: 4px;
+            }
         }
+
+        &__like-icon,
+        &__comment-icon {
+            stroke: $color-gray-lighter;
+            fill: $color-gray-lighter;
+            width: 18px;
+            height: 18px;
+            transition: fill 0.2s;
+
+            @include vp-1199 {
+                width: 16px;
+                height: 16px;
+            }
+
+            @include vp-1199 {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+
+        &_button_liked {
+            fill: rgb(255, 104, 104);
+            transition: fill 0.2s;
+        }
+    }
+
+    .error-like-enter-active,
+    .error-like-leave-active {
+        transition: opacity 0.2s ease;
+    }
+
+    .error-like-enter-from,
+    .error-like-leave-to {
+        opacity: 0;
     }
 </style>

@@ -55,7 +55,6 @@ export const useRegisterStore = defineStore('register', () => {
         avatar: null,
     })
 
-    // Убрать специализацию при регистрации!!!!
     const additionalDataTrainer = reactive<IAdditionalDataTrainer>({
         address: '',
     })
@@ -64,14 +63,12 @@ export const useRegisterStore = defineStore('register', () => {
     const userRole = ref<boolean>(false)
     
     const checkUserRole = computed<string>(() => userRole.value ? 'coach' : 'customer')
-
-    //TODO
     
     const sendDataReg = async(): Promise<any> =>  {
         preloaderStore.loading = true
 
         const data: ICommonData = {
-            phoneNumber: commonData['phoneNumber'],
+            phoneNumber: commonData['phoneNumber'].replace(/-/gi, ''),
             email: commonData['email'],
             password: commonData['password'],
             fullName: commonData['fullName'],
@@ -82,7 +79,6 @@ export const useRegisterStore = defineStore('register', () => {
         }
 
         try {
-            // checkUserRole.value === 'customer' || checkUserRole.value === 'trainer' 
             if(['customer', 'coach'].includes(checkUserRole.value)) {
                 if(checkUserRole.value === 'coach') {
                     data.address = additionalDataTrainer['address']
@@ -99,7 +95,7 @@ export const useRegisterStore = defineStore('register', () => {
                 router.push(checkedRole)
                 return response
             } else {
-                console.log('Несуществующая роль')
+                throw Error
             }
             
         } catch(error: any) {

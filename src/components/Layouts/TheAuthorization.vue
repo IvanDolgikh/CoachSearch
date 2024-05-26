@@ -9,6 +9,7 @@
                     <span>Логин</span>
                     <input type="text"
                         name="Login"
+                        required
                         v-model="authStore.login">
                 </label>
 
@@ -16,6 +17,7 @@
                     <span>Пароль</span>
                     <input type="password"
                         name="Password"
+                        required
                         v-model="authStore.password">
                 </label>
 
@@ -47,8 +49,6 @@
 <style lang="scss"
     scoped>
 
-    @import "@variables";
-
     .authorization {
         flex: auto;
         flex-grow: 1;
@@ -61,19 +61,36 @@
             position: relative;
             width: 600px;
             height: auto;
-            padding: 35px;
+            padding: 34px;
             background-color: $color-base-white;
             border-radius: 8px;
             box-shadow: 7px 7px 17px 6px rgba(0, 0, 0, 0.2);
+
+            @include vp-1199 {
+                width: 500px;
+                padding: 24px;
+            }
+
+            @include vp-767 {
+                width: 360px;
+            }
         }
 
         &__title {
             font-size: 26px;
             font-weight: 600;
-            color: rgb(51 51 51);
             margin-bottom: 50px;
             text-align: center;
             line-height: 1.4;
+
+            @include vp-1199 {
+                font-size: 22px;
+                margin-bottom: 40px;
+            }
+
+            @include vp-767 {
+                font-size: 18px;
+            }
         }
 
         &__label {
@@ -83,22 +100,44 @@
             span {
                 display: block;
                 margin-bottom: 15px;
-                color: rgb(51 51 51);
                 font-size: 20px;
                 font-weight: 500;
+
+                @include vp-1199 {
+                    font-size: 18px;
+                }
+
+                @include vp-767 {
+                    font-size: 16px;
+                }
             }
 
             input {
                 width: 100%;
                 background-color: transparent;
                 border: none;
-                border-bottom: 1px solid #333333;
-                color: rgb(51, 51, 51);
+                border-bottom: 1px solid $color-dark;
                 font-size: 20px;
                 padding: 3px 5px 3px 5px;
+                transition: border 0.2s;
 
+                @include vp-1199 {
+                    font-size: 18px;
+                }
+
+                @include vp-767 {
+                    font-size: 16px;
+                }
+
+                &:hover,
                 &:focus-visible {
                     outline: none;
+                    border-color: $color-accent;
+                    transition: border 0.2s;
+                }
+
+                &:active {
+                    border-color: $color-accent-middle;
                 }
             }
         }
@@ -114,12 +153,45 @@
             cursor: pointer;
             margin-bottom: 28px;
             width: 100%;
+            transition: background-color 0.2s;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
+
+            &:hover,
+            &:focus-visible {
+                outline: none;
+                background-color: $color-accent-middle;
+                transition: background-color 0.2s;
+            }
+
+            &:active {
+                background-color: $color-accent-lighter;
+            }
         }
 
         &__question {
-            color: rgb(51, 51, 51);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 400;
+
+            @include vp-1199 {
+                font-size: 12px;
+            }
+
+            &:hover,
+            &:focus-visible {
+                outline: none;
+                color: $color-gray-lighter;
+            }
+
+            &:active {
+                color: $color-gray-lighter;
+            }
         }
 
         &__error {
@@ -129,6 +201,10 @@
             right: 0;
             margin: 0 auto;
             width: fit-content;
+
+            @include vp-767 {
+                top: -54px;
+            }
         }
     }
 

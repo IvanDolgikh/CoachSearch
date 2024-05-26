@@ -5,8 +5,6 @@
         </div>
         <div class="user__container"
             v-if="data && !isEditable">
-            <!-- <router-link class="user__edit-profile"
-                :to="{ name: 'edit-mode', params: { data: data.phoneNumber } }">Редактировать профиль</router-link> -->
             <button class="user__edit-profile"
                 @click="isEditable = !isEditable">Редактировать профиль</button>
 
@@ -53,11 +51,9 @@
                 </div>
             </div>
 
-            <!-- <router-view></router-view> -->
-
         </div>
 
-        <EditProfile v-if="isEditable"
+        <EditProfile v-if="isEditable && data"
             :userData="data"
             @close-modal="isEditable = !isEditable"
             @update-data="updateData" />
@@ -99,16 +95,13 @@
         info: string;
     }
 
-    // const data = ref<IData | null>(null);
-
     const data = ref<IData>();
 
-    const getUserProfileData = async () => {
+    const getUserProfileData = async (): Promise<void> => {
         try {
-            const result = await getData(url)
+            const result: IData = await getData(url)
             data.value = result;
-            return result
-        } catch {
+        } catch (error: any) {
             errorsStore.showAndHideGettingDataError()
         }
     }
@@ -117,34 +110,52 @@
 
     onMounted(async (): Promise<void> => {
         preloaderStore.loading = true
-        getUserProfileData()
+        await getUserProfileData()
         preloaderStore.loading = false
     });
 </script>
 
 <style lang="scss"
     scoped>
-    @import "@variables";
 
     .user {
+        flex-grow: 1;
 
         &__logo-container {
             width: 100%;
             border-bottom: 1px solid $color-gray-lighter;
-            margin: 0 0 60px 0;
-            padding: 15px 0 15px 0;
+            margin-bottom: 60px;
+            padding: 15px 100px;
+
+            @include vp-1199 {
+                margin-bottom: 40px;
+                padding: 10px 60px;
+            }
+
+            @include vp-767 {
+                margin-bottom: 30px;
+                padding: 8px 20px;
+            }
         }
 
         &__logo {
-            max-width: 1440px;
-            margin: 0 auto;
+            width: fit-content;
+            margin-left: auto;
         }
 
         &__container {
-            position: relative;
             max-width: 1440px;
             padding: 0 80px;
-            margin: 7% auto 10% auto;
+            margin: 0 auto 10% auto;
+
+            @include vp-1199 {
+                padding: 0 60px;
+            }
+
+            @include vp-767 {
+                padding: 0 20px;
+            }
+
         }
 
         &__edit-profile {
@@ -153,10 +164,36 @@
             padding: 10px 15px;
             border: 1px solid $color-gray-lighter;
             border-radius: 8px;
+            font-size: 16px;
             color: $color-base-text;
             margin: 0 0 60px auto;
             width: fit-content;
             cursor: pointer;
+            transition: background-color 0.2s, border 0.2s;
+
+            &:hover,
+            &:focus-visible {
+                outline: none;
+                background-color: $color-accent-lighter;
+                border-color: $color-accent-lighter;
+                transition: background-color 0.2s, border 0.2s;
+            }
+
+            &:active {
+                background-color: transparent;
+                border-color: $color-accent-lighter;
+            }
+
+            @include vp-1199 {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            @include vp-767 {
+                font-size: 12px;
+                padding: 6px 8px;
+                margin-bottom: 40px;
+            }
         }
 
         &__base-info-container {
@@ -166,6 +203,15 @@
             grid-template-rows: min-content 1fr;
             column-gap: 40px;
             margin-bottom: 40px;
+
+            @include vp-1199 {
+                margin-bottom: 30px;
+            }
+
+            @include vp-767 {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         &__image {
@@ -174,12 +220,34 @@
             border-radius: 20px;
             grid-column: 1;
             grid-row: 1 / 3;
+
+            @include vp-1199 {
+                width: 180px;
+                height: 180px;
+            }
+
+            @include vp-767 {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto 20px auto;
+            }
         }
 
         &__fio {
             font-size: 30px;
             text-align: start;
             margin: 20px 0 40px 0;
+
+            @include vp-1199 {
+                font-size: 26px;
+                margin: 14px 0 30px 0;
+            }
+
+            @include vp-767 {
+                font-size: 22px;
+                text-align: center;
+                margin: 0 0 12px 0;
+            }
         }
 
         &__link-container {
@@ -188,53 +256,114 @@
             display: flex;
             column-gap: 20px;
             justify-self: start;
+
+            @include vp-1199 {
+                column-gap: 14px;
+            }
+
+            @include vp-767 {
+                margin: 0 auto;
+            }
+        }
+
+        &__social-icon {
+            width: 48px;
+            height: 48px;
+
+            @include vp-1199 {
+                width: 40px;
+                height: 40px;
+            }
+
+            @include vp-767 {
+                width: 32px;
+                height: 32px;
+            }
         }
 
         &__additional-info-container {
-            margin-top: 20px;
             display: flex;
             flex-direction: column;
-            flex: 1;
-            row-gap: 10px;
+            row-gap: 30px;
+
+            @include vp-1199 {
+                row-gap: 20px;
+            }
         }
 
         &__contacts-container {
-            background-color: aqua;
             padding: 22px;
             border-radius: 20px;
             background-color: #e2e2e2;
-            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            row-gap: 18px;
+
+            @include vp-1199 {
+                padding: 18px;
+                row-gap: 16px;
+            }
+
+            @include vp-767 {
+                row-gap: 12px;
+            }
         }
 
         &__contacts-title,
         &__about-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 22px;
+            margin-bottom: 8px;
             font-weight: 600;
+
+            @include vp-1199 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            @include vp-767 {
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
         }
 
         &__tel,
         &__email {
-            font-size: 20px;
+            font-size: 18px;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
 
             strong {
                 font-weight: 500;
             }
         }
 
-        &__tel {
-            margin-bottom: 20px;
-        }
-
         &__about-container {
             margin-left: 22px;
+
+            @include vp-1199 {
+                margin-left: 18px;
+            }
         }
 
         &__about {
-            font-size: 20px;
+            font-size: 18px;
             border-bottom: 1px solid $color-gray-lighter;
             padding-bottom: 10px;
             line-height: 1.6;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
         }
     }
 </style>

@@ -11,6 +11,9 @@ export const useFiltersStore = defineStore('filters', () => {
         isLiked: boolean;
         likesCount: number;
         specializations: string[];
+        gender: string;
+        age: number;
+        workExperience: string;
     }
 
     // Модалка с фильтрами
@@ -42,7 +45,7 @@ export const useFiltersStore = defineStore('filters', () => {
     ])
 
     // Для radioButton
-    let valueGender = ref<string>('')
+    const valueGender = ref<string>('')
 
     // Для sliderAge
     const valueAge = ref<number[]>([18, 80]);
@@ -53,26 +56,7 @@ export const useFiltersStore = defineStore('filters', () => {
     // Для best
     const valueBest = ref<string>('')
 
-    const filteredCoaches = ref<IData[]>()
-
-    // Фильтрация для специализации
-    // const filterSpecializations = (data: IData[] | undefined) => {
-    //     const listSpecializations: string[] = valueSpecialization.value.map(item => item.name)
-    //     console.log(data)
-    //     if(listSpecializations.length === 0) {
-    //         return data
-    //     }
-    //     else if (data) {
-    //         // return listSpecializations.includes(item.specializations)
-    //         return data.filter(item => item.specializations.some(spec => listSpecializations.includes(spec)))
-    //     }
-    // }
-
-    // const acceptFilters = (data: IData[] | undefined) => {
-    //     filterSpecializations(data)
-    //     console.log(data)
-    //     isOpenModal.value = !isOpenModal.value
-    // }
+    const filteredCoaches = ref<IData[]>([])
 
     return { valueSpecialization,
              optionSpecialization,
@@ -84,7 +68,5 @@ export const useFiltersStore = defineStore('filters', () => {
              valueBest,
              isOpenModal,
              filteredCoaches,
-            //  acceptFilters,
-            //  filterSpecializations 
             }
 })

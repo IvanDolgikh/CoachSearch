@@ -12,10 +12,11 @@
                 class="coach__warning"
                 v-if="!data.isRegistrationFinished">
                 <span class="pi pi-exclamation-triangle"></span>
-                <p>Чтобы ваш профиль успешно отображался в списке тренеров,<br>завершите настройку своего профиля</p>
+                <p>Чтобы ваш профиль успешно отображался в списке тренеров, завершите настройку своего профиля</p>
             </a>
 
             <button class="coach__edit-profile"
+                v-if="data.isRegistrationFinished"
                 @click="isEditable = !isEditable">Редактировать профиль</button>
 
             <div class="coach__base-info-container">
@@ -34,20 +35,25 @@
 
                 <p class="coach__fio">{{ data.fullName }}</p>
 
-                <p class="coach__age"
-                    v-if="data.age">
-                    Возраст: <strong>{{ `${data.age} лет` }}</strong>
-                </p>
+                <div class="coach__personal-info">
+                    <p class="coach__personal-info-title">Личная информация</p>
+                    <p class="coach__age"
+                        v-if="data.age">
+                        Возраст: <strong>{{ `${data.age} лет` }}</strong>
+                    </p>
 
-                <p class="coach__experience"
-                    v-if="data.workExperience">
-                    Опыт работы: <strong>{{ `${data.workExperience} лет` }}</strong>
-                </p>
+                    <p class="coach__experience"
+                        v-if="data.workExperience">
+                        Опыт работы: <strong>{{ `${data.workExperience} лет` }}</strong>
+                    </p>
 
-                <p class="coach__specialization"
-                    v-if="data.specializations">
-                    Специализация: <strong>{{ specializations }}</strong>
-                </p>
+                    <p class="coach__specialization"
+                        v-if="specializations">
+                        Специализация: <strong>{{ specializations }}</strong>
+                    </p>
+                </div>
+
+
 
                 <div class="coach__link-container">
                     <a class="coach__social-link"
@@ -61,33 +67,33 @@
                 </div>
             </div>
 
-            <div class="coach__additional-info-container">
-                <div class="coach__contacts-container">
-                    <p class="coach__contacts-title">Контактная информация</p>
-                    <p class="coach__tel">
-                        Телефон: <strong>{{ data.phoneNumber }}</strong>
-                    </p>
-                    <p class="coach__email">
-                        Эл почта: <strong>{{ data.email }}</strong>
-                    </p>
-                    <p class="coach__address">
-                        Место проведения тренировок:
-                        <strong>{{ data.address }}</strong>
-                    </p>
-                </div>
 
-                <div class="coach__about-container">
-                    <p class="coach__about-title">О себе</p>
-                    <p class="coach__about">{{ data.info }}</p>
-                </div>
-
-                <CoachProfileRequiredInformation id="required-info"
-                    v-if="!data.isRegistrationFinished"
-                    @get-additional-data="getadditionalData" />
+            <div class="coach__contacts-container">
+                <p class="coach__contacts-title">Контактная информация</p>
+                <p class="coach__tel">
+                    Телефон: <strong>{{ data.phoneNumber }}</strong>
+                </p>
+                <p class="coach__email">
+                    Эл почта: <strong>{{ data.email }}</strong>
+                </p>
+                <p class="coach__address">
+                    Место проведения тренировок:
+                    <strong>{{ data.address }}</strong>
+                </p>
             </div>
+
+            <div class="coach__about-container">
+                <p class="coach__about-title">О себе</p>
+                <p class="coach__about">{{ data.info }}</p>
+            </div>
+
+            <CoachProfileRequiredInformation id="required-info"
+                v-if="!data.isRegistrationFinished"
+                @get-additional-data="getadditionalData" />
+
         </div>
 
-        <EditProfile v-if="isEditable"
+        <EditProfile v-if="isEditable && data"
             :userData="data"
             @close-modal="isEditable = !isEditable"
             @update-data="updateData" />
@@ -115,6 +121,7 @@
     const preloaderStore = usePreloaderStore();
     const errorsStore = useErrorsStore()
 
+
     const isEditable = ref<boolean>(false)
 
     const url: string = `${baseUrl}api/coach/profile`;
@@ -137,50 +144,75 @@
 
     const data = ref<IData>();
 
-    const getCoachProfileData = async () => {
+    const getCoachProfileData = async (): Promise<IData | undefined> => {
         try {
             const result = await getData(url)
             data.value = result;
             return result
-        } catch {
+        } catch (error: any) {
             errorsStore.showAndHideGettingDataError()
         }
     }
 
     const getadditionalData = (finishData: IData): IData => data.value = finishData
+    const updateData = (newData: IData): IData => data.value = newData
 
-    const specializations = computed(() => {
+    const specializations = computed<string>(() => {
         if (data.value?.specializations) {
             return data.value.specializations.join(', ')
         }
+        return ''
     });
-
-    const updateData = (newData: IData): IData => data.value = newData
 
     onMounted(async (): Promise<void> => {
         preloaderStore.loading = true
-        getCoachProfileData()
+        await getCoachProfileData()
         preloaderStore.loading = false
     });
 </script>
 
 <style lang="scss"
     scoped>
-    @import "@variables";
 
     .coach {
 
+        flex-grow: 1;
 
         &__logo-container {
             width: 100%;
             border-bottom: 1px solid $color-gray-lighter;
-            margin: 0 0 60px 0;
-            padding: 15px 0 15px 0;
+            margin-bottom: 60px;
+            padding: 15px 100px;
+
+            @include vp-1199 {
+                margin-bottom: 40px;
+                padding: 10px 60px;
+            }
+
+            @include vp-767 {
+                margin-bottom: 30px;
+                padding: 8px 20px;
+            }
         }
 
         &__logo {
+            width: fit-content;
+            margin-left: auto;
+        }
+
+        &__container {
+            position: relative;
             max-width: 1440px;
-            margin: 0 auto;
+            padding: 0 80px;
+            margin: 0 auto 10% auto;
+
+            @include vp-1199 {
+                padding: 0 60px;
+            }
+
+            @include vp-767 {
+                padding: 0 20px;
+            }
         }
 
         &__warning {
@@ -188,32 +220,57 @@
             align-items: center;
             column-gap: 30px;
             width: fit-content;
-            margin: 0 auto 50px auto;
+            margin: 0 auto 90px auto;
             padding: 10px 30px;
             background-color: $color-base-white;
             border: none;
             border-radius: 10px;
             font-family: "Montserrat", sans-serif;
             color: #4d4d4d;
-            font-weight: 300;
+            font-weight: 400;
             text-align: left;
             line-height: 1.4;
             cursor: pointer;
 
             p {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             span {
                 font-size: 26px;
                 color: $color-accent;
             }
-        }
 
-        &__container {
-            max-width: 1440px;
-            padding: 0 80px;
-            margin: 0 auto 10% auto;
+
+            @include vp-1199 {
+                padding: 8px 20px;
+                margin-bottom: 60px;
+
+                p {
+                    font-size: 14px;
+                }
+
+                span {
+                    font-size: 24px;
+                }
+            }
+
+            @include vp-767 {
+                display: flex;
+                flex-direction: column;
+                row-gap: 14px;
+                padding: 8px 16px;
+                margin-bottom: 40px;
+
+                p {
+                    font-size: 12px;
+                    text-align: center;
+                }
+
+                span {
+                    font-size: 21px;
+                }
+            }
         }
 
         &__edit-profile {
@@ -222,100 +279,259 @@
             padding: 10px 15px;
             border: 1px solid $color-gray-lighter;
             border-radius: 8px;
+            font-size: 16px;
             color: $color-base-text;
             margin: 0 0 60px auto;
+            width: fit-content;
             cursor: pointer;
+            transition: background-color 0.2s, border 0.2s;
+
+            &:hover,
+            &:focus-visible {
+                outline: none;
+                background-color: $color-accent-lighter;
+                border-color: $color-accent-lighter;
+                transition: background-color 0.2s, border 0.2s;
+            }
+
+            &:active {
+                background-color: transparent;
+                border-color: $color-accent-lighter;
+            }
+
+            @include vp-1199 {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            @include vp-767 {
+                font-size: 12px;
+                padding: 6px 8px;
+                margin-bottom: 40px;
+            }
         }
 
         &__base-info-container {
             display: grid;
             grid-template-columns: min-content 1fr;
-            grid-template-rows: repeat(4, min-content);
+            grid-template-rows: repeat(3, min-content);
             justify-content: start;
             column-gap: 40px;
             margin-bottom: 40px;
 
-            .coach__image {
-                display: block;
-                object-fit: cover;
-                border-radius: 20px;
-                grid-column: 1;
-                grid-row: 1 / 5;
+            @include vp-1199 {
+                margin-bottom: 26px;
             }
 
-            .coach__fio {
-                font-size: 30px;
-                margin: 20px 0;
-            }
-
-            .coach__specialization {
-                font-size: 20px;
-                line-height: 1.5;
-            }
-
-            .coach__age,
-            .coach__experience {
-                font-size: 20px;
-                margin-bottom: 10px
-            }
-
-            .coach__link-container {
-                grid-column: 1;
-                margin-top: 20px;
-                height: fit-content;
+            @include vp-767 {
                 display: flex;
-                column-gap: 20px;
-                justify-self: center;
+                flex-direction: column;
             }
         }
 
-        &__additional-info-container {
-            margin-top: 20px;
+        &__image {
+            display: block;
+            object-fit: cover;
+            border-radius: 20px;
+            grid-column: 1;
+            grid-row: 1 / 3;
+
+            @include vp-1199 {
+                width: 180px;
+                height: 180px;
+            }
+
+            @include vp-767 {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto 20px auto;
+                order: 0;
+            }
+        }
+
+        &__fio {
+            font-size: 30px;
+            text-align: start;
+            margin: 20px 0;
+
+            @include vp-1199 {
+                font-size: 26px;
+                margin: 14px 0 16px 0;
+            }
+
+            @include vp-767 {
+                font-size: 22px;
+                text-align: center;
+                margin: 0 0 12px 0;
+                order: 1;
+            }
+        }
+
+        &__personal-info {
             display: flex;
             flex-direction: column;
-            flex: 1;
-            row-gap: 10px;
+            row-gap: 30px;
 
-            .coach__contacts-container {
-                padding: 22px;
-                border-radius: 20px;
-                background-color: #e2e2e2;
-                margin-bottom: 30px;
-                display: flex;
-                flex-direction: column;
+            @include vp-1199 {
                 row-gap: 20px;
             }
 
-            .coach__tel,
-            .coach__email,
-            .coach__address {
-                font-size: 20px;
-            }
-
-            .coach__specialization-container {
-                padding: 22px;
-                border-radius: 20px;
+            @include vp-767 {
+                row-gap: 10px;
+                order: 3;
+                padding: 18px;
                 background-color: #e2e2e2;
-                margin-bottom: 30px;
+                border-radius: 20px;
+            }
+        }
+
+        &__age,
+        &__experience,
+        &__specialization {
+
+            font-size: 18px;
+
+            @include vp-1199 {
+                font-size: 16px;
             }
 
-            .coach__about-container {
-                margin: 0 0 40px 22px;
+            @include vp-767 {
+                font-size: 14px;
+            }
+        }
+
+        &__link-container {
+            grid-column: 1;
+            margin-top: 20px;
+            height: fit-content;
+            display: flex;
+            column-gap: 20px;
+            justify-self: center;
+
+            @include vp-1199 {
+                column-gap: 14px;
+                margin-top: 16px;
             }
 
-            .coach__about {
-                font-size: 20px;
-                border-bottom: 1px solid $color-gray-lighter;
-                padding-bottom: 10px;
-                line-height: 1.6;
+            @include vp-767 {
+                margin: 0 auto 20px auto;
+                order: 2;
+            }
+        }
+
+        &__social-icon {
+            width: 48px;
+            height: 48px;
+
+            @include vp-1199 {
+                width: 40px;
+                height: 40px;
+            }
+
+            @include vp-767 {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        &__contacts-container {
+            padding: 22px;
+            border-radius: 20px;
+            background-color: #e2e2e2;
+            display: flex;
+            flex-direction: column;
+            row-gap: 18px;
+            margin-bottom: 40px;
+
+            @include vp-1199 {
+                padding: 18px;
+                row-gap: 14px;
+                margin-bottom: 26px;
+            }
+
+            @include vp-767 {
+                row-gap: 12px;
+            }
+        }
+
+        &__tel,
+        &__email,
+        &__address {
+            font-size: 18px;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
+            }
+        }
+
+        &__address,
+        &__specialization {
+            line-height: 1.5;
+        }
+
+        &__about-container {
+            margin-left: 22px;
+
+            @include vp-1199 {
+                margin-left: 18px;
+            }
+        }
+
+        &__about {
+            font-size: 18px;
+            border-bottom: 1px solid $color-gray-lighter;
+            padding-bottom: 10px;
+            line-height: 1.5;
+
+            @include vp-1199 {
+                font-size: 16px;
+            }
+
+            @include vp-767 {
+                font-size: 14px;
             }
         }
 
         &__contacts-title,
-        &__about-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+        &__about-title,
+        &__personal-info-title {
+            font-size: 22px;
+            margin-bottom: 8px;
             font-weight: 600;
+
+            @include vp-1199 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            @include vp-767 {
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+        }
+
+        &__personal-info-title {
+            display: none;
+
+            @include vp-767 {
+                display: block;
+            }
+        }
+
+        &__about-title {
+            margin-bottom: 20px;
+
+            @include vp-1199 {
+                margin-bottom: 16px;
+            }
+
+            @include vp-767 {
+                margin-bottom: 14px;
+            }
         }
 
         strong {

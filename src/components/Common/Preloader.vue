@@ -2,7 +2,7 @@
 
     <div class="preloader">
         <div class="preloader__container">
-            <ProgressSpinner style="width: 120px; height: 120px"
+            <ProgressSpinner class="preloader__circle"
                 strokeWidth="3"
                 aria-label="Loading" />
             <p class="preloader__title">Минутку, я думаю...</p>
@@ -34,10 +34,32 @@
             align-items: center;
         }
 
+        &__circle {
+            width: 120px;
+            height: 120px;
+
+            @include vp-1199 {
+                width: 100px;
+                height: 100px;
+            }
+
+            @include vp-767 {
+                width: 80px;
+                height: 80px;
+            }
+        }
 
         &__title {
             margin-top: 20px;
-            font-size: 28px;
+            font-size: 26px;
+
+            @include vp-1199 {
+                font-size: 24px;
+            }
+
+            @include vp-767 {
+                font-size: 20px;
+            }
         }
     }
 

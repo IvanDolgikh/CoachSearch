@@ -29,6 +29,10 @@
             background-color: $color-base-white;
             overflow: hidden;
 
+            @include vp-767 {
+                padding: 10px 20px;
+            }
+
             &::before {
                 content: "";
                 position: absolute;
@@ -67,14 +71,31 @@
         span {
             display: block;
             font-size: 20px;
-            color: $color-gray-lighter;
             color: $color-accent;
             z-index: 2;
+
+            @include vp-1199 {
+                font-size: 18px;
+            }
+
+            @include vp-767 {
+                font-size: 16px;
+            }
         }
 
         p {
+            font-weight: 400;
             font-size: 14px;
             z-index: 2;
+
+            @include vp-1199 {
+                font-size: 12px;
+            }
+
+            @include vp-767 {
+                font-size: 10px;
+            }
+
         }
     }
 </style>

@@ -4,9 +4,7 @@
 
             <router-link class="logo__link"
                 to="/">
-                <img width="60"
-                    height="60"
-                    src="../../assets/images/svg/icon-logo.svg"
+                <img src="../../assets/images/svg/icon-logo.svg"
                     alt="Логотп CoachSearch" />
             </router-link>
 
@@ -24,7 +22,22 @@
     .logo {
         &__container {
             width: fit-content;
-            margin-left: auto;
+        }
+
+        &__link img {
+            display: block;
+            width: 60px;
+            height: 60px;
+
+            @include vp-1199 {
+                width: 46px;
+                height: 46px;
+            }
+
+            @include vp-767 {
+                width: 36px;
+                height: 36px;
+            }
         }
     }
 </style>

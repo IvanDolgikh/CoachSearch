@@ -20,8 +20,6 @@
 <style lang="scss"
     scoped>
 
-    @import "@variables";
-
     .error-reg {
         &__container {
             display: flex;
@@ -78,6 +76,7 @@
 
         p {
             font-size: 14px;
+            font-weight: 500;
             z-index: 2;
         }
     }

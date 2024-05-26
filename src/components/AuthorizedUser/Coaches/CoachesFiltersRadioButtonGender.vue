@@ -34,19 +34,30 @@
 </script>
 
 <style lang="scss">
-@import "@variables";
-
 .filter-sex {
 
     &__container {
         display: flex;
         column-gap: 30px;
         margin-bottom: 30px;
+
+        @include vp-1199 {
+            margin-bottom: 26px;
+        }
+
+        @include vp-767 {
+            margin-bottom: 24px;
+            column-gap: 22px;
+        }
     }
 
     &__radio-container {
         display: flex;
         column-gap: 10px;
+
+        @include vp-767 {
+            column-gap: 8px;
+        }
     }
 
     /* Стилизация toggle */
@@ -60,6 +71,18 @@
 
     .required-information .p-highlight {
         background-color: transparent;
+    }
+
+    .ml-2 {
+        font-size: 18px;
+
+        @include vp-1199 {
+            font-size: 16px;
+        }
+
+        @include vp-767 {
+            font-size: 14px;
+        }
     }
 
 }

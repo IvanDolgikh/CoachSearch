@@ -31,7 +31,6 @@ export const useAuthStore = defineStore('auth', () => {
         password: string,
     }
     
-    // TODO
     const sendDataAuth = async(): Promise<any> =>  {
         
         preloaderStore.loading = true
@@ -57,10 +56,9 @@ export const useAuthStore = defineStore('auth', () => {
             router.push(checkedRole)
             
             return response
-        } catch (errors) {
+        } catch(error: any) {
             preloaderStore.loading = false
             errorsStore.showAndHideAuthError()
-            console.error(errors);
         }
     }
 

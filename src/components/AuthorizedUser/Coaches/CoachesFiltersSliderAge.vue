@@ -31,17 +31,29 @@
 </script>
 
 <style lang="scss">
-@import "@variables";
-
 .filter-age {
     &__container {
         max-width: 300px;
         margin: 0 0 30px 8px;
+
+        @include vp-1199 {
+            max-width: 270px;
+            margin-bottom: 26px;
+        }
+
+        @include vp-767 {
+            margin-bottom: 24px;
+        }
     }
 
     &__show-age {
         display: block;
         margin-top: 16px;
+        font-size: 16px;
+
+        @include vp-767 {
+            font-size: 14px;
+        }
     }
 
     // Стилизация Slider

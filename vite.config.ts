@@ -13,7 +13,17 @@ export default defineConfig({
     alias: [
       { find: '@api', replacement: path.resolve(__dirname, './src/api')},
       { find: '@icons-svg', replacement: path.resolve(__dirname, './src/assets/images/svg')},
-      { find: '@variables', replacement: path.resolve(__dirname, './src/assets/style/variables.scss')}
     ],
   },
+
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @import "./src/assets/style/mixins.scss";
+          @import "./src/assets/style/variables.scss";
+        `
+      }
+    }
+  }
 })

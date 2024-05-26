@@ -28,11 +28,11 @@ export const useErrorsStore = defineStore('errors', () => {
 
     const registerErrors: IRegisterErrors = {
         errorPhone: {
-            errorText: 'User with this phone already exists',
+            errorText: 'Пользователь с таким номером телефона уже существует',
             errorValue: errorPhoneReg
         },
         errorEmail: {
-            errorText: 'User with this email already exists',
+            errorText: 'Пользователь с такой почтой уже существует',
             errorValue: errorEmailReg
         },
     }
@@ -53,11 +53,20 @@ export const useErrorsStore = defineStore('errors', () => {
 
     const errorGettingData = ref<boolean>(false)
 
-    const showAndHideGettingDataError = () => {
+    const showAndHideGettingDataError = (): TSetTimeout => {
         errorGettingData.value = true
         return setTimeout(() => {
             errorAuth.value = false
         }, 5000)
+    }
+
+    const errorLeaveLike = ref<boolean>(false)
+
+    const showAndHideLeaveLikeError = (): TSetTimeout => {
+        errorLeaveLike.value = true
+        return setTimeout(() => {
+            errorLeaveLike.value = false
+        }, 3000)
     }
 
     return { errorAuth,
@@ -67,5 +76,7 @@ export const useErrorsStore = defineStore('errors', () => {
             errorPhoneReg,
             errorEmailReg,
             errorGettingData,
-            showAndHideGettingDataError}
+            showAndHideGettingDataError,
+            errorLeaveLike,
+            showAndHideLeaveLikeError}
 })
