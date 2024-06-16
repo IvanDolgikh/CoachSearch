@@ -185,6 +185,7 @@
       width: 100%;
       height: 250px;
       margin-bottom: 22px;
+      object-position: top;
 
       @include vp-1199 {
         height: 210px;
